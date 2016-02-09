@@ -1,16 +1,17 @@
 #ifndef NEURAL_NETWORK_H
 #define NEURAL_NETWORK_H
 
-//TODO No se si esto es mejor asi o con una unica matriz
+
 
 typedef struct Neural_Layer_ {
   int n_perceptrons;             /* Number of perceptrons in this layer */
-  int n_perceptrons_b;           /* Number of perceptrons in the layer before*/
-  int ** weights;                /* n_perceptrons * n_perceptrons_b */
+  int n_perceptrons_t;           /* Number of perceptrons in the whole network*/
+  int ** weights;                /* n_perceptrons * n_perceptrons_total */
 } Neural_Layer;
 
 typedef struct Neural_Network_ {
   int n_layers;
+  int n_perceptrons;
   Neural_Layer ** layers;
 } Neural_Network;
 
