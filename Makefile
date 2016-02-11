@@ -13,9 +13,11 @@ ODIR		= obj
 BDIR		= bin
 
 # FILES
+TARGET		= neural-network
 SOURCES		:= $(wildcard $(SDIR)/*.c)
 INCLUDES 	:= $(wildcard $(IDIR)/*.h)
 OBJECTS  	:= $(SOURCES:$(SDIR)/%.c=$(ODIR)/%.o)
+CHK_SOURCES	:= $(SOURCES) $(INCLUDES)
 
 # VARIABLES
 # Compiler
@@ -28,8 +30,16 @@ LFLAGS		= -Wall -I$(IDIR)
 rm			= rm -f
 
 # Compiles all programs in project
-compile:
-	@echo "TODO: compile"
+compile: $(BDIR)/$(TARGET)
+	@echo "INFO: All targets compiled"
+
+$(BDIR)/$(TARGET): $(OBJECTS)
+	@$(LINKER) $@ $(LFLAGS) $(OBJECTS)
+	@echo "INFO: Linking completed"
+
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "INFO: Compiled "$<" successfully"
 
 # P1.2 MacCulloch-Pitts Network
 p1.2-macculloch-pits:
@@ -44,8 +54,9 @@ p1.3.2-adelaide:
 	@echo "TODO: p1.3.2-adelaide"
 
 # Flycheck (emacs) requirement
+.PHONEY: check-syntax
 check-syntax:
-	gcc -o nul -S ${CHK_SOURCES}
+	@$(LINKER) nul $(LFLAGS) -S ${CHK_SOURCES}
 
 # Displays the help for this makefile
 help:
@@ -54,3 +65,4 @@ help:
 .PHONEY: clean
 clean:
 	@$(rm) $(OBJECTS)
+	@echo "INFO: Cleaning completed"
