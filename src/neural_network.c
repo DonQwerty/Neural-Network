@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../include/neural_network.h"
+#include "neural_network.h"
 
 /* Public Methods */
 Neural_Network * nn_new() {
@@ -10,4 +10,3 @@ Neural_Network * nn_new() {
   nn->layers = null;
   return nn;
 }
-

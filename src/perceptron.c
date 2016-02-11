@@ -1,5 +1,5 @@
 #include <math.h>
-#include "../include/perceptron.h"
+#include "perceptron.h"
 
 
 double perc_process(double input) {

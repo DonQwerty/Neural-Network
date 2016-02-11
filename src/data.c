@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/data.h"
+#include "data.h"
 
 /* Public Methods */
 
