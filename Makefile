@@ -37,7 +37,7 @@ $(BDIR)/$(TARGET): $(OBJECTS)
 	@$(LINKER) $@ $(LFLAGS) $(OBJECTS)
 	@echo "INFO: Linking completed"
 
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+$(OBJECTS):$(ODIR)/%.o: $(SDIR)/%.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "INFO: Compiled "$<" successfully"
 

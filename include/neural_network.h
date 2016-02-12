@@ -28,19 +28,7 @@ typedef struct Neural_Network_ {
 
 
 
-// OLD
 
-typedef struct Neural_Layer_ {
-    int n_perceptrons;             /* Number of perceptrons in this layer */
-    int n_perceptrons_t;           /* Number of perceptrons in the whole network*/
-    int ** weights;                /* n_perceptrons * n_perceptrons_total */
-} Neural_Layer;
-
-typedef struct Neural_Network_ {
-    int n_layers;
-    int n_perceptrons;
-    Neural_Layer ** layers;
-} Neural_Network;
 
 
 /* Public Methods */
