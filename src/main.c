@@ -13,8 +13,12 @@ int main(int argc, char *argv[])
 
     printf("Creating network\n");
     Neural_Network * nn = nn_read_from_file("../data/models/prueba1.txt");
-    printf("Neural network successfully created\n");
-    nn_free(nn);
+    if (nn) {
+        printf("Neural network successfully created\n");
+        nn_free(nn);
+    } else {
+        printf("Error reading from file\n");
+    }
     
     return 0;
 }
