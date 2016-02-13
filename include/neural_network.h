@@ -64,7 +64,7 @@ int nn_save_to_file(Neural_Network * nn, char * file);
 void nn_free(Neural_Network * nn);
 
 /* Updates the values for a neural network */
-int nn_update_neurons();
+int nn_update_neurons(Neural_Network * nn);
 
 
 

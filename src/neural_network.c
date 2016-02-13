@@ -190,7 +190,7 @@ int nn_connect_neuron(Neural_Network * nn, int n_neuron_to, double * w_neurons_f
 
     return 1;
 }
-int nn_update_neurons(){
+int nn_update_neurons(Neural_Network * nn){
     int i;
     /* Update neurons */
     for (i = 0; i < nn->n_neurons; i++) {
