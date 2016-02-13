@@ -3,7 +3,7 @@
 #include "neural_network.h"
 
 /* Public Methods */
-Neural_Network * nn_new(int n_layers, int * n_neurons_layer) {
+Neural_Network * nn_new(int n_layers, int * n_neurons_layer, int * thresholds) {
     Neural_Network * nn;
     Neuron * neurons_arr;
     int n_neurons_total;
@@ -20,7 +20,7 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer) {
     if (!neurons_arr) return NULL;
     /* Initialize neurons */
     for (i = 0; i < n_neurons_total; i++) {
-        neuron_init(neurons_arr + i);
+        neuron_init(neurons_arr + i,thresholds[i]);
     }
     
     /* Allocates memory for the network */
@@ -55,7 +55,7 @@ Neural_Network * nn_read_from_file(char * file) {
     Neural_Network * nn;
     FILE * f;
     int n_layers, n_neurons;
-    int * n_neurons_layer;
+    int * n_neurons_layer, *thresholds;
     double * cons;
     int i, j, count;
     
@@ -92,10 +92,26 @@ Neural_Network * nn_read_from_file(char * file) {
     for (i = 0; i < n_layers; i++) {
         n_neurons += n_neurons_layer[i];
     }
+    /* thresholds */
+    printf("[ INFO ]     Thresholds: ");
+    thresholds = (int * ) malloc(n_neurons * sizeof(int));
+    for (i = 0; i < n_neurons; i++) {
+        count = fscanf(f, "%d", thresholds + i);
+        if (count == EOF) {
+            if (ferror(f)) {
+                free(thresholds);
+                fclose(f);
+                return NULL;
+            }
+        }
+        printf("%d ", thresholds[i]);
+    }
+    printf("\n");
+
 
 
     /* CREATE NETWORK */
-    nn = nn_new(n_layers, n_neurons_layer);
+    nn = nn_new(n_layers, n_neurons_layer,thresholds);
     free(n_neurons_layer);
     /* Add neurons connections */
     cons = (double * ) malloc(n_neurons * sizeof(double));
@@ -185,11 +201,12 @@ int layer_init(Neural_Layer * l, int n_neurons, Neuron * first) {
 }
 
 /* Neuron Methods */
-int neuron_init(Neuron * n) {
+int neuron_init(Neuron * n, int threshold) {
     if (!n) return -1;
     n->d = 0.0;
     n->err = 0.0;
     n->n_cons = 0;
+    n->threshold=threshold;
     n->cons = NULL;
     return 0;
 }

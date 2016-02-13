@@ -10,7 +10,8 @@ typedef struct Connection_ {
 typedef struct Neuron_ {
     double d;                      /* Neuron's value */
     double err;                    /* Error, for training purposes */
-    int n_cons;                    /* Number of connections (not sure if necessary) */
+    int n_cons;
+    int threshold;                    /* Number of connections (not sure if necessary) */
     Connection * cons;             /* Neuron's connections */
 } Neuron;
 
@@ -30,7 +31,7 @@ typedef struct Neural_Network_ {
 /* Public Methods */
 /* Allocates memory for the neural network with n layers and
    n_neurons_layer per layer (includind first/last layers) */
-Neural_Network * nn_new(int n_layers, int * n_neurons_layer);
+Neural_Network * nn_new(int n_layers, int * n_neurons_layer, int * thresholds);
 
 /* Reads a neural network from a file.
    Supposing we have the following network with 3 layers:
@@ -79,7 +80,7 @@ int layer_init(Neural_Layer * l, int n_neurons, Neuron * first);
 
 /* Neuron methods */
 /* Sets the default values for a neuron */
-int neuron_init(Neuron * n);
+int neuron_init(Neuron * n,int threshold);
 
 
 #endif /* NEURAL_NETWORK_H */

@@ -1,4 +1,4 @@
-#include <stdio.h>
+	#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "data.h"
@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     data_free(d);
 
     printf("Creating network\n");
-    Neural_Network * nn = nn_read_from_file("../data/models/prueba1.txt");
+    Neural_Network * nn = nn_read_from_file("../data/models/McCulloch-Pitts.txt");
     if (nn) {
         printf("Neural network successfully created\n");
         nn_free(nn);
