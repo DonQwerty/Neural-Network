@@ -2,9 +2,6 @@
 #define NEURAL_NETWORK_H
 
 
-/* Functions definition */
-typedef double (*nn_upd_neuron)(Neuron *);
-
 /* Structures definitions */
 typedef struct Connection_ {
     double weight;
@@ -19,6 +16,9 @@ typedef struct Neuron_ {
     int threshold;                 
     Connection * cons;             /* Neuron's connections */
 } Neuron;
+
+/* Functions definition */
+typedef double (*nn_upd_neuron)(Neuron *);
 
 typedef struct Neural_Layer_ {
     int n_neurons;                 /* Number of neurons in this layer */
@@ -69,6 +69,9 @@ void nn_free(Neural_Network * nn);
 
 /* Updates the values for a neural network */
 int nn_update_neurons(Neural_Network * nn);
+
+/*Prints the last layer of the neural network*/
+void print_output(Neural_Network * nn);
 
 
 

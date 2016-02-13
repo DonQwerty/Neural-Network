@@ -199,6 +199,22 @@ int nn_update_neurons(Neural_Network * nn){
     return 0;
 }
 
+void print_output(Neural_Network * nn){
+    int i;
+    for(i = 0; i < nn->layers[nn->n_layers -1].n_neurons ; i++){
+        printf("%f\t", nn->layers[nn->n_layers -1].neurons[i].d);
+    }
+    printf("\n");
+}
+
+void set_entry_neural_network(Neural_Network * nn, double * values, int n_values){
+    int i;
+    /* Free connections */
+    for (i = 0; i < n_values; i++) {
+        nn_array(nn)[i].d = values[i];
+    }
+}
+
 
 /* Layer Methods */
 int layer_init(Neural_Layer * l, int n_neurons, Neuron * first) {
