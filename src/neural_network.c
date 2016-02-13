@@ -70,6 +70,8 @@ Neural_Network * nn_read_from_file(char * file) {
             return NULL;
         }
     }
+    printf("[ INFO ] Creating network with %d layers\n", n_layers);
+    printf("[ INFO ]     Neurons per layer: ");
     /* Neurons per layer */
     n_neurons_layer = (int * ) malloc(n_layers * sizeof(int));
     for (i = 0; i < n_layers; i++) {
@@ -81,7 +83,9 @@ Neural_Network * nn_read_from_file(char * file) {
                 return NULL;
             }
         }
+        printf("%d ", n_neurons_layer[i]);
     }
+    printf("\n");
     fscanf(f, "\n");
     /* Total number of neurons */
     n_neurons = 0;
