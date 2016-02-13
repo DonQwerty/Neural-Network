@@ -2,6 +2,10 @@
 #define NEURAL_NETWORK_H
 
 
+/* Functions definition */
+typedef double (*nn_upd_neuron)(Neuron *);
+
+/* Structures definitions */
 typedef struct Connection_ {
     double weight;
     struct Neuron_ * from;
@@ -9,10 +13,10 @@ typedef struct Connection_ {
 
 typedef struct Neuron_ {
     double d;
-    double d_new;                     /* Neuron's value */
+    double d_new;                  /* Neuron's value */
     double err;                    /* Error, for training purposes */
-    int n_cons;
-    int threshold;                    /* Number of connections (not sure if necessary) */
+    int n_cons;                    /* Number of connections */
+    int threshold;                 
     Connection * cons;             /* Neuron's connections */
 } Neuron;
 
@@ -23,10 +27,10 @@ typedef struct Neural_Layer_ {
 
 typedef struct Neural_Network_ {
     int n_neurons;                 /* Total number of neurons in the net */
+    nn_upd_neuron upd_neuron;      /* Function to compute the new value of a neuron */
     int n_layers;                  /* Number of layers in the network (including in/out) */
     Neural_Layer * layers;         /* Layers array */
 } Neural_Network;
-
 
 
 /* Public Methods */
