@@ -4,9 +4,17 @@
 #include "data.h"
 #include "neural_network.h"
 
-int main(){
-    printf("Hello world\n");
+
+int main(int argc, char *argv[])
+{
+    printf("Reading data...\n");
     Data * d = data_from_file("../data/databases/problema_real1.txt");
     data_free(d);
-    return 1;
+
+    printf("Creating network\n");
+    Neural_Network * nn = nn_read_from_file("../data/models/prueba1.txt");
+    printf("Neural network successfully created\n");
+    nn_free(nn);
+    
+    return 0;
 }

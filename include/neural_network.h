@@ -40,18 +40,26 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer);
    o <   /
        o
    Assuming all weights equal to 1, the file to represent it should be as follows:
+   3                           # Number of layers
    2 3 1                       # Number of perceptrons for each layer
-   0.0 0.0 1.0 1.0 0.0 0.0     # First perceptron connections (with weights)
-   0.0 0.0 0.0 1.0 1.0 0.0     # Second perceptron connections
-   0.0 0.0 0.0 0.0 0.0 1.0     # (...)
-   0.0 0.0 0.0 0.0 0.0 1.0
-   0.0 0.0 0.0 0.0 0.0 1.0
-
+   0.0 0.0 0.0 0.0 0.0 0.0     # First perceptron connections (with weights)
+   0.0 0.0 0.0 0.0 0.0 0.0     # Second perceptron connections
+   1.0 0.0 0.0 0.0 0.0 0.0     # (...)
+   1.0 1.0 0.0 0.0 0.0 0.0
+   0.0 1.0 0.0 0.0 0.0 0.0
+   0.0 0.0 1.0 1.0 1.0 0.0
+   
 */
-int nn_read_from_file(Neural_Network * nn, char * file);
+Neural_Network * nn_read_from_file(char * file);
 
 /* Reads a neural network from stdin, asking for each layer's weights */
 int nn_read_from_stdin(Neural_Network * nn);
+
+/* Saves the network to a file, in the format specified previously */
+int nn_save_to_file(Neural_Network * nn, char * file);
+
+/* Destroy the network structure and free memory */
+void nn_free(Neural_Network * nn);
 
 
 

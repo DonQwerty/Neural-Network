@@ -3,7 +3,7 @@
 #include "neural_network.h"
 
 /* Public Methods */
-Neural_Network * nn_new(int n_layers, int * n_nerons_layer) {
+Neural_Network * nn_new(int n_layers, int * n_neurons_layer) {
     Neural_Network * nn;
     Neuron * neurons_arr;
     int n_neurons_total;
@@ -49,6 +49,88 @@ Neural_Network * nn_new(int n_layers, int * n_nerons_layer) {
     }
     
     return nn;
+}
+
+Neural_Network * nn_read_from_file(char * file) {
+    Neural_Network * nn;
+    FILE * f;
+    int n_layers, n_neurons;
+    int * n_neurons_layer;
+    double * cons;
+    int i, j, count;
+    
+    f = fopen(file, "r");
+    if (!f) return NULL;
+
+    /* Number of layers */
+    count = fscanf(f, "%d\n", &n_layers);
+    if (count == EOF) {
+        if (ferror(f)) {
+            fclose(f);
+            return NULL;
+        }
+    }
+    /* Neurons per layer */
+    n_neurons_layer = (int * ) malloc(n_layers * sizeof(int));
+    for (i = 0; i < n_layers; i++) {
+        count = fscanf(f, "%d", n_neurons_layer + i);
+        if (count == EOF) {
+            if (ferror(f)) {
+                free(n_neurons_layer);
+                fclose(f);
+                return NULL;
+            }
+        }
+    }
+    fscanf(f, "\n");
+    /* Total number of neurons */
+    n_neurons = 0;
+    for (i = 0; i < n_layers; i++) {
+        n_neurons += n_neurons_layer[i];
+    }
+
+
+    /* CREATE NETWORK */
+    nn = nn_new(n_layers, n_neurons_layer);
+    free(n_neurons_layer);
+    /* Add neurons connections */
+    cons = (double * ) malloc(n_neurons * sizeof(double));
+    for (i = 0; i < n_neurons; i++) {
+        /* Read connections for neuron i */
+        for (j = 0; j < n_neurons; j++) {
+            count = fscanf(f, "%lf", cons + j);
+            if (count == EOF) {
+                if (ferror(f)) {
+                    free(cons);
+                    fclose(f);
+                    nn_free(nn);
+                    return NULL;
+                }
+            }
+        }
+        fscanf(f, "\n");
+        nn_connect_neuron(nn, i, cons);
+    }
+    free(cons);
+    fclose(f);
+    return nn;
+}
+
+void nn_free(Neural_Network * nn) {
+    int i;
+    /* Free connections */
+    for (i = 0; i < nn->n_neurons; i++) {
+        free(nn_array(nn)[i].cons);
+    }
+    
+    /* Free neurons */
+    free(nn_array(nn));
+
+    /* Free layers */
+    free(nn->layers);
+
+    /* Free network */
+    free(nn);
 }
 
 
