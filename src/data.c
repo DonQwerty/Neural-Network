@@ -37,6 +37,11 @@ Data * data_from_file(char * file){
 }
 
 void data_free(Data * d){
+    int i;
+    for ( i = 0; i < d->n_samples; i++){
+        sample_free(d->samples[i]);
+    }
+    free(d->samples);
     free(d);
 }
 
@@ -69,6 +74,11 @@ void sample_fill(Sample * sample, char * text){
             sample->values[i]=j-i;
         }
     }
+}
+
+void sample_free(Sample * sample){
+    free(sample->values);
+    free(sample);
 }
 
 Data * data_new(){

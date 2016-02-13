@@ -26,6 +26,7 @@ int data_init(Data * d, int n_classes, int n_samples, int n_attrs);
 
 Sample * sample_new(int n_attrs,int n_classes);
 void sample_fill(Sample * sample, char * text);
+void sample_free(Sample * sample);
 
 
 #endif /* DATA_H */ 
