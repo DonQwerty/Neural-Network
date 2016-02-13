@@ -8,7 +8,8 @@ typedef struct Connection_ {
 } Connection;
 
 typedef struct Neuron_ {
-    double d;                      /* Neuron's value */
+    double d;
+    double d_new;                     /* Neuron's value */
     double err;                    /* Error, for training purposes */
     int n_cons;
     int threshold;                    /* Number of connections (not sure if necessary) */
@@ -62,6 +63,9 @@ int nn_save_to_file(Neural_Network * nn, char * file);
 /* Destroy the network structure and free memory */
 void nn_free(Neural_Network * nn);
 
+/* Updates the values for a neural network */
+int nn_update_neurons();
+
 
 
 /* Private Methods */
@@ -81,6 +85,8 @@ int layer_init(Neural_Layer * l, int n_neurons, Neuron * first);
 /* Neuron methods */
 /* Sets the default values for a neuron */
 int neuron_init(Neuron * n,int threshold);
+/* Updates the values for a neuron */
+int neuron_update(Neuron * n);
 
 
 #endif /* NEURAL_NETWORK_H */

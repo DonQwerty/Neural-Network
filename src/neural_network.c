@@ -190,6 +190,14 @@ int nn_connect_neuron(Neural_Network * nn, int n_neuron_to, double * w_neurons_f
 
     return 1;
 }
+int nn_update_neurons(){
+    int i;
+    /* Update neurons */
+    for (i = 0; i < nn->n_neurons; i++) {
+        if(neuron_update(&nn_array(nn)[i])==-1) return -1;
+    }
+    return 0;
+}
 
 
 /* Layer Methods */
@@ -204,9 +212,16 @@ int layer_init(Neural_Layer * l, int n_neurons, Neuron * first) {
 int neuron_init(Neuron * n, int threshold) {
     if (!n) return -1;
     n->d = 0.0;
+    n->d_new = 0.0;
     n->err = 0.0;
     n->n_cons = 0;
     n->threshold=threshold;
     n->cons = NULL;
+    return 0;
+}
+int neuron_update(Neuron * n) {
+    if (!n) return -1;
+    n->d = n->d_new;
+    n->d_new = 0.0;
     return 0;
 }
