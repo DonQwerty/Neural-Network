@@ -153,6 +153,25 @@ void nn_free(Neural_Network * nn) {
     free(nn);
 }
 
+void print_output(Neural_Network * nn){
+    int i;
+    for(i = 0; i < nn->layers[nn->n_layers -1].n_neurons ; i++){
+        printf("%f\t", nn->layers[nn->n_layers -1].neurons[i].d);
+    }
+    printf("\n");
+}
+
+void nn_update(Neural_Network * nn, double * values, int n_values){
+    int i;
+    set_entry_neural_network(nn, values, n_values);
+    for (i = n_values; i < nn->n_neurons; i++) {
+        (*nn->upd_neuron)(&nn_array(nn)[i]);
+    }
+    nn_keep_value_neurons(nn);   
+    print_output(nn); 
+
+}
+
 
 
 /* Private Methods */
@@ -176,6 +195,7 @@ int nn_connect_neuron(Neural_Network * nn, int n_neuron_to, double * w_neurons_f
     /* Allocate memory for the connections */
     n_to = &(nn_array(nn)[n_neuron_to]);
     n_to->cons = (Connection *) malloc(n_connections * sizeof(Connection));
+    n_to->n_cons = n_connections;
     if (!(n_to->cons)) return -1;
 
     /* Stablish the connections */
@@ -190,7 +210,7 @@ int nn_connect_neuron(Neural_Network * nn, int n_neuron_to, double * w_neurons_f
 
     return 1;
 }
-int nn_update_neurons(Neural_Network * nn){
+int nn_keep_value_neurons(Neural_Network * nn){
     int i;
     /* Update neurons */
     for (i = 0; i < nn->n_neurons; i++) {
@@ -199,19 +219,13 @@ int nn_update_neurons(Neural_Network * nn){
     return 0;
 }
 
-void print_output(Neural_Network * nn){
-    int i;
-    for(i = 0; i < nn->layers[nn->n_layers -1].n_neurons ; i++){
-        printf("%f\t", nn->layers[nn->n_layers -1].neurons[i].d);
-    }
-    printf("\n");
-}
+
 
 void set_entry_neural_network(Neural_Network * nn, double * values, int n_values){
     int i;
     /* Free connections */
     for (i = 0; i < n_values; i++) {
-        nn_array(nn)[i].d = values[i];
+        nn_array(nn)[i].d_new = values[i];
     }
 }
 

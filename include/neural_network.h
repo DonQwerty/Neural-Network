@@ -18,7 +18,7 @@ typedef struct Neuron_ {
 } Neuron;
 
 /* Functions definition */
-typedef double (*nn_upd_neuron)(Neuron *);
+typedef void (*nn_upd_neuron)(Neuron *);
 
 typedef struct Neural_Layer_ {
     int n_neurons;                 /* Number of neurons in this layer */
@@ -67,11 +67,17 @@ int nn_save_to_file(Neural_Network * nn, char * file);
 /* Destroy the network structure and free memory */
 void nn_free(Neural_Network * nn);
 
-/* Updates the values for a neural network */
-int nn_update_neurons(Neural_Network * nn);
+/* Keep the values for a neural network */
+int nn_keep_value_neurons(Neural_Network * nn);
 
 /*Prints the last layer of the neural network*/
 void print_output(Neural_Network * nn);
+
+/*Set a entry for the neural network*/
+void set_entry_neural_network(Neural_Network * nn, double * values, int n_values);
+
+/*Updates the neural network*/
+void nn_update(Neural_Network * nn, double * values, int n_values);
 
 
 
