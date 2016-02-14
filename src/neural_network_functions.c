@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "neural_network_functions.h"
-#include "neural_network.h"
+
 
 
 void upd_neuron_mcculloch_pitts (Neuron * neuron){
