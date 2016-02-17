@@ -4,6 +4,30 @@
 #include "data.h"
 
 /* Public Methods */
+void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen){
+	int n_samples,i;
+	int index;
+	Sample * aux;
+	n = data->n_samples
+
+	train = data_new();
+	test = data_new();
+	srand(time(NULL));
+	for (i = 0 ; i < n ; i++){
+		r = rand()%(n-i);
+		aux =  data->samples[i];
+        data->samples[i]= data->samples[r+i];
+        data->samples[r+i] =  aux;
+	}
+	index = (porcen* n)/100:
+	n_samples_set(train,index);
+	n_samples_set(test, n - index);
+	n_classes_set(data->n_classes);
+	n_classes_set(data->n_classes);
+	train->samples = data->samples;
+	test->samples = dara->samples + index;
+	free(data);
+}
 
 Data * data_from_file(char * file){
     FILE * f = fopen(file,"r");
@@ -86,7 +110,6 @@ Data * data_new(){
   
   if (!data) return NULL;
   
-  data->size = 0;
   data->n_classes=0;
   data->n_samples = 0;
   data->samples = NULL;
@@ -110,3 +133,10 @@ int data_init(Data * d, int n_classes, int n_samples, int n_attrs) {
   return 0;
 }
 
+void n_samples_set(Data * d, int n_samples){
+	d->n_samples = n_samples;
+}
+
+void n_classes_set(Data * d, int n_classes){
+	d->n_classes = n_classes;
+}
