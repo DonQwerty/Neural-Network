@@ -16,7 +16,7 @@ typedef struct Data_ {
 } Data;
 
 /* Public Methods */
-void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen)
+void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen);
 Data * data_from_file(char * file);
 void data_free(Data * d);
 
@@ -28,6 +28,6 @@ Sample * sample_new(int n_attrs,int n_classes);
 void sample_fill(Sample * sample, char * text);
 void sample_free(Sample * sample);
 void n_classes_set(Data * d, int n_classes);
-void n_samples_set(Data * d, int n_samples)
+void n_samples_set(Data * d, int n_samples);
 
 #endif /* DATA_H */ 

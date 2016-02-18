@@ -161,7 +161,7 @@ void print_output(Neural_Network * nn){
     printf("\n");
 }
 
-void nn_update(Neural_Network * nn, double * values, int n_values){
+void nn_update_discrete(Neural_Network * nn, double * values, int n_values){
     int i;
     set_entry_neural_network(nn, values, n_values);
     for (i = n_values; i < nn->n_neurons; i++) {

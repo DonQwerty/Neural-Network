@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "data.h"
 
 /* Public Methods */
+
 void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen){
-	int n_samples,i;
+	int i,r,n;
 	int index;
 	Sample * aux;
-	n = data->n_samples
+	n = data->n_samples;
 
 	train = data_new();
 	test = data_new();
@@ -19,13 +21,13 @@ void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen){
         data->samples[i]= data->samples[r+i];
         data->samples[r+i] =  aux;
 	}
-	index = (porcen* n)/100:
+	index = (porcen* n)/100;
 	n_samples_set(train,index);
 	n_samples_set(test, n - index);
-	n_classes_set(data->n_classes);
-	n_classes_set(data->n_classes);
+	n_classes_set(train,data->n_classes);
+	n_classes_set(test,data->n_classes);
 	train->samples = data->samples;
-	test->samples = dara->samples + index;
+	test->samples = data->samples + index;
 	free(data);
 }
 
