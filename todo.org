@@ -1,9 +1,9 @@
 * Programa Principal
-** IN-PROGRESS Argumentos
+** DONE Argumentos
    - mode=
      + preset:    ejecuta con opciones preestablecidas (ej1, ...).
      + simulate:  recibe un fichero con la red, otro con el input, y un output.
-     + clasify:   crea un clasificador desde un fichero de red y otro de datos.
+     + classify:  crea un clasificador desde un fichero de red y otro de datos.
    - neural-file: archivo con la definición de red neuronal.
    - input-file:  archivo con las entradas de la red.
    - output-file: archivo donde escribir la salida de la clasificación.
