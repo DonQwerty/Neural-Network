@@ -1,6 +1,7 @@
 #ifndef CLASSIFIER_H
 #define CLASSIFIER_H
 
+#include "data.h"
 #include "neural_network.h"
 
 /* Default Values */
@@ -8,7 +9,9 @@
 #define DEF_GENERALIZATION_PERCENT 20.0
 #define DEF_VALIDATION_PERCENT     20.0
 #define DEF_LEARNING_RATE          0.2
-#define DEF_MAX_EPOCHS             100
+#define DEF_MAX_EPOCHS             1500
+#define DEF_MAX_ACCURACY           95
+#define DEF_MAX_MSE                0.001
 
 typedef struct Classifier_ {
     
@@ -17,11 +20,13 @@ typedef struct Classifier_ {
     Data           * data_training;
     Data           * data_generalization;
     Data           * data_validation;
+    int              epoch;
     
     /* Classifier Parameters */
     double learning_rate;
-    int    epoch;
     int    max_epochs;
+    double max_accuracy;
+    double max_mse;
     
     /* Epoch Statistics */
     /* Accuracy */
@@ -39,28 +44,27 @@ typedef struct Classifier_ {
 /* Public Methods */
 /* Allocates memory for the classifier with default parameters */
 // TODO Does this receive the number of classes and attributes?
+//      If not, it cannot allocate memory for the network
 Classifier * nnc_new();
 
 /* Changes the parameters. If NULL, the default value is used */
-int nnc_set_training_parameters(double learning_rate, int max_epochs);
+int nnc_set_training_parameters(Classifier * c, double learning_rate);
 
+/* Receives the data and divides it into training, generalization and validation */
 // TODO What does this receive? The file? The Data *?
-int nnc_set_data();
+int nnc_set_data(Classifier * c, Data * d);
 
-/* Sets the stopping conditions */
+/* Sets the stopping conditions. If NULL, the condition is not used */
+int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accuracy, double max_mse);
+
+/* Trains the network until a stopping condition is reached */
+int nnc_train_network(Classifier * c);
+
+/* Deletes the classifier and the neural network and frees its memory */
+int nnc_free(Classifier * c);
 
 /* Private Methods */
-
-
-
-
-
-
-
-
-
-
-
+void nnc_run_training_epoch(Classifier * c);
 
 
 #endif /* CLASSIFIER_H */

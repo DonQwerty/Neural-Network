@@ -1,6 +1,6 @@
 * Programa Principal
 ** DONE Argumentos
-   - mode=
+   - mode
      + preset:    ejecuta con opciones preestablecidas (ej1, ...).
      + simulate:  recibe un fichero con la red, otro con el input, y un output.
      + classify:  crea un clasificador desde un fichero de red y otro de datos.
@@ -60,5 +60,5 @@
     - nnc_set_stopping_conditions
     - nnc_train_network
 
-** TODO Crear Clasificadores
+** IN-PROGRESS Crear Clasificadores
    Crear los clasificadores necesarios en la práctica.
