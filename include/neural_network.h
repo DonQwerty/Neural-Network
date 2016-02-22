@@ -77,7 +77,7 @@ void print_output(Neural_Network * nn);
 void set_entry_neural_network(Neural_Network * nn, double * values, int n_values);
 
 /*Updates the neural network*/
-void nn_update_discrete(Neural_Network * nn, double * values, int n_values);
+void nn_update(Neural_Network * nn, double * values, int n_values, int discrete);
 
 
 

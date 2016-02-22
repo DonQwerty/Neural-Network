@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
             ptr = strtok(NULL,SEP);
             values[j] = atof(ptr); 
         }
-        nn_update_discrete(nn, values, 3);
+        nn_update(nn, values, 3, 1);
     }
     
 

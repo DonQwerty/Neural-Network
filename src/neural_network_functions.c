@@ -23,6 +23,35 @@ void upd_neuron_mcculloch_pitts (Neuron * neuron){
 	return;
 }
 
+void upd_neuron_perceptron (Neuron * neuron){
+	int i;
+	double value = 0;
+	double weight;
+	for ( i = 0; i < neuron->n_cons; i++){
+		weight = neuron->cons[i].weight;
+		value += weight * neuron->cons[i].from->d;
+	}
+	if(value < (-neuron->threshold))
+		neuron->d = -1;
+	else if (value > neuron->threshold)
+		neuron->d = 1;
+	else
+		neuron->d = 0;
+	return;
+}
+
+void upd_neuron_adeline (Neuron * neuron){
+	int i;
+	double value = 0;
+	double weight;
+	for ( i = 0; i < neuron->n_cons; i++){
+		weight = neuron->cons[i].weight;
+		value += weight * neuron->cons[i].from->d;
+	}
+	neuron->d = value;
+	return;
+}
+
 
 void upd_weights_perceptron (Neuron * neuron,double alpha, double t){
 	int i;

@@ -161,13 +161,14 @@ void print_output(Neural_Network * nn){
     printf("\n");
 }
 
-void nn_update_discrete(Neural_Network * nn, double * values, int n_values){
+void nn_update(Neural_Network * nn, double * values, int n_values, int discrete){
     int i;
     set_entry_neural_network(nn, values, n_values);
     for (i = n_values; i < nn->n_neurons; i++) {
         (*nn->upd_neuron)(&nn_array(nn)[i]);
     }
-    nn_keep_value_neurons(nn);   
+	if(discrete)
+		nn_keep_value_neurons(nn);   
     print_output(nn); 
 
 }
@@ -223,7 +224,7 @@ int nn_keep_value_neurons(Neural_Network * nn){
 
 void set_entry_neural_network(Neural_Network * nn, double * values, int n_values){
     int i;
-    /* Free connections */
+    /* Init values */
     for (i = 0; i < n_values; i++) {
         nn_array(nn)[i].d_new = values[i];
     }
