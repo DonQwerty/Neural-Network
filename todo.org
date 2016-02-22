@@ -9,8 +9,56 @@
    - output-file: archivo donde escribir la salida de la clasificación.
 
 * Clasificador
-** TODO Crear Interfaz
-   Mirar qué estructura de datos es mejor.
-   Definir métodos genéricos de entrenamiento y test.
+** DONE Consideraciones de Diseño
+*** Data Sets
+    - Usual data division:
+      + Training Set:       ~ 60%
+      + Generalization Set: ~ 20%
+      + Validation Set:     ~ 20%
+*** Cost Function and Minimization
+    - Supervised learning:
+      + Cost:     mean squared error
+      + Minimice: gradient descent
+    - Unsupervised learning:
+      + Cost:     MODEL dependant
+      + Minimice: gradient descent
+    - Reinforcement learning:
+        We shouldn't implement this one
+*** Learning Algorithm
+    - BACKPROPAGATION: Minimice cost using gradient descent.
+      1. Feed patterns through neural network
+      2. Check errors and calculate error gradients
+      3. Update weights according to error gradients
+*** Stop Conditions
+    - Maximum epochs
+    - Training set accuracy
+    - Generalization set accuracy
+    - Training set mean squared error
+    - Generalization set mean squared error
+
+** IN-PROGRESS Interface
+*** Variables
+**** Classifier
+    - Neural_Network nn;
+    - Data * training_set;
+    - Data * generalization_set;
+    - Data * validation_set;
+**** Parameters
+    - double learning_rate;
+    - int epoch;
+    - int max_epochs;
+**** Statistics
+    - double training_accuracy;
+    - double generalization_accuracy;
+    - double validation_accuracy;
+    - double training_mse;
+    - double generalization_mse;
+    - double validation_mse;
+*** Methods
+    - nnc_set_data_sets
+    - nnc_set_training_parameters
+    - nnc_set_stopping_conditions
+    - nnc_train_network
+
 ** TODO Crear Clasificadores
    Crear los clasificadores necesarios en la práctica.
