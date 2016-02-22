@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "classifier.h"
 
 /* Public Methods */
@@ -40,7 +43,7 @@ int nnc_set_training_parameters(Classifier * c, double learning_rate) {
 }
 
 int nnc_set_data(Classifier * c, Data * d) {
-    if (!c || !data) return -1;
+    if (!c || !d) return -1;
 
     // TODO Implement
     
@@ -58,3 +61,12 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 }
 
 /* Private Methods */
+
+void nnc_run_training_epoch(Classifier * c){
+	int i;
+	for( i = 0 ; i < data_get_n_samples(*(c->data_training)) ; i++){
+		Sample * s = data_get_samples(*(c->data_training))[i];
+		int n_attrs = sample_get_n_attrs(*s);
+		nn_update(c->nn, sample_get_values(*s), n_attrs, 0); //TODO el 0 es porque no queremos discreta
+	}
+}

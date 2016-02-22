@@ -135,10 +135,38 @@ int data_init(Data * d, int n_classes, int n_samples, int n_attrs) {
   return 0;
 }
 
+/*Setter  */
+
 void n_samples_set(Data * d, int n_samples){
 	d->n_samples = n_samples;
 }
 
 void n_classes_set(Data * d, int n_classes){
 	d->n_classes = n_classes;
+}
+
+
+/* Getter */
+int data_get_n_classes(Data  d){
+	return d.n_classes ;
+}
+
+int data_get_n_samples(Data  d){
+	return d.n_samples ;
+}
+
+Sample ** data_get_samples(Data  d){
+	return d.samples ;
+}
+
+int sample_get_n_attrs(Sample  s){
+	return s.n_attrs ;
+}
+
+int sample_get_n_classes(Sample  s){
+	return s.n_classes ;
+}
+
+double * sample_get_values(Sample  s){
+	return s.values ;
 }

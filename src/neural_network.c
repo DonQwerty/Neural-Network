@@ -259,42 +259,42 @@ int neuron_update(Neuron * n) {
 }
 
 /*Getters */
-int n_neurons_nn_get(Neural_Network * n){
-	return n->n_neurons;
+int n_neurons_nn_get(Neural_Network n){
+	return n.n_neurons;
 }
-int n_layers_get(Neural_Network * n){
-	return n->n_layers;
-}
-
-Neural_Layer * layers_get(Neural_Network * n){
-	return n->layers;
+int n_layers_get(Neural_Network n){
+	return n.n_layers;
 }
 
-int n_neurons_layer_get(Neural_Layer * nl){
-	return nl->n_neurons;
-}
-Neuron * neurons_layer_get(Neural_Layer * nl){
-	return nl->neurons;
+Neural_Layer * layers_get(Neural_Network n){
+	return n.layers;
 }
 
-double value_neuron_get(Neuron * n){
-	return n->d;
+int n_neurons_layer_get(Neural_Layer nl){
+	return nl.n_neurons;
+}
+Neuron * neurons_layer_get(Neural_Layer nl){
+	return nl.neurons;
 }
 
-double new_value_neuron_get(Neuron * n){
-	return n->d_new;
+double value_neuron_get(Neuron n){
+	return n.d;
 }
 
-int n_cons_neuron_get(Neuron * n){
-	return n->n_cons;
+double new_value_neuron_get(Neuron n){
+	return n.d_new;
 }
 
-double threshold_neuron_get(Neuron * n){
-	return n->threshold;
+int n_cons_neuron_get(Neuron  n){
+	return n.n_cons;
 }
 
-Connection * connections_neuron_get(Neuron * n){
-	return n->cons;
+double threshold_neuron_get(Neuron  n){
+	return n.threshold;
+}
+
+Connection * connections_neuron_get(Neuron  n){
+	return n.cons;
 }
 
 double weight_connecion_get(Connection  c){

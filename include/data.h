@@ -27,7 +27,18 @@ int data_init(Data * d, int n_classes, int n_samples, int n_attrs);
 Sample * sample_new(int n_attrs,int n_classes);
 void sample_fill(Sample * sample, char * text);
 void sample_free(Sample * sample);
+
+/*Setter*/
 void n_classes_set(Data * d, int n_classes);
 void n_samples_set(Data * d, int n_samples);
+
+/*Getter */
+int data_get_n_classes(Data  d);
+int data_get_n_samples(Data  d);
+Sample ** data_get_samples(Data  d);
+
+int sample_get_n_attrs(Sample  s);
+int sample_get_n_classes(Sample  s);
+double * sample_get_values(Sample  s);
 
 #endif /* DATA_H */ 

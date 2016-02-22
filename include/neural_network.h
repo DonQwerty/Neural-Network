@@ -103,18 +103,18 @@ int neuron_update(Neuron * n);
 
 
 /*Getters */
-int n_neurons_nn_get(Neural_Network * n);
-int n_layers_get(Neural_Network * n);
-Neural_Layer * layers_get(Neural_Network * n);
+int n_neurons_nn_get(Neural_Network n);
+int n_layers_get(Neural_Network n);
+Neural_Layer * layers_get(Neural_Network n);
 
-int n_neurons_layer_get(Neural_Layer * nl);
-Neuron * neurons_layer_get(Neural_Layer * nl);
+int n_neurons_layer_get(Neural_Layer nl);
+Neuron * neurons_layer_get(Neural_Layer nl);
 
-double value_neuron_get(Neuron * n);
-double new_value_neuron_get(Neuron * n);
-int n_cons_neuron_get(Neuron * n);
-double threshold_neuron_get(Neuron * n);
-Connection * connections_neuron_get(Neuron * n);
+double value_neuron_get(Neuron n);
+double new_value_neuron_get(Neuron n);
+int n_cons_neuron_get(Neuron n);
+double threshold_neuron_get(Neuron n);
+Connection * connections_neuron_get(Neuron n);
 
 double weight_connecion_get(Connection  c);
 Neuron *  neuron_from_connecion_get(Connection  c);
