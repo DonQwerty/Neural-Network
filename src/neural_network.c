@@ -9,7 +9,7 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
     int n_neurons_total;
     int i, offset;
 
-    /* Compute the total number of neurons */
+   /* Compute the total number of neurons */
     n_neurons_total = 0;
     for (i = 0; i < n_layers; i++) {
         n_neurons_total += n_neurons_layer[i];
@@ -51,7 +51,7 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
     return nn;
 }
 
-Neural_Network * nn_read_from_file(char * file) {
+Neural_Network * nn_read_from_file(const char * file) {
     Neural_Network * nn;
     FILE * f;
     int n_layers, n_neurons;
@@ -154,12 +154,12 @@ void nn_free(Neural_Network * nn) {
     free(nn);
 }
 
-void print_output(Neural_Network * nn){
+void fprint_output(Neural_Network * nn, FILE * f){
     int i;
     for(i = 0; i < nn->layers[nn->n_layers -1].n_neurons ; i++){
-        printf("%f\t", nn->layers[nn->n_layers -1].neurons[i].d);
+        fprintf(f, "%f\t", nn->layers[nn->n_layers -1].neurons[i].d);
     }
-    printf("\n");
+    fprintf(f, "\n");
 }
 
 void nn_update(Neural_Network * nn, double * values, int n_values, int discrete){
@@ -169,9 +169,7 @@ void nn_update(Neural_Network * nn, double * values, int n_values, int discrete)
         (*nn->upd_neuron)(&nn_array(nn)[i]);
     }
 	if(discrete)
-		nn_keep_value_neurons(nn);   
-    print_output(nn); 
-
+		nn_keep_value_neurons(nn);
 }
 
 

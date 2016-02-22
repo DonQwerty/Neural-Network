@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
+
 #include "data.h"
 #include "neural_network_functions.h"
 
@@ -13,11 +14,17 @@
 /* Presets */
 #define PRESET_MCCULLOCH  0
 
+/* Preset files */
+static const char P_MCCULLOCH_NEURAL[]      = "data/models/McCulloch-Pitts.txt";
+static const char P_MCCULLOCH_INPUT[]       = "data/databases/McCulloch-Pitts.txt";
+static const char P_MCCULLOCH_OUTPUT[]      = "out/McCulloch-Pitts.txt";
+
+
 /* Global variables for options processing */
 int mode = -1;
 int preset = -1;
 char * neural_file = NULL;
-char * input_file = NULL;
+char * input_file  = NULL;
 char * output_file = NULL;
 
 /* Stores the values for the options in the propper global variables */
@@ -29,48 +36,80 @@ void print_help();
 
 int main(int argc, char *argv[]){
 
+    Neural_Network * nn;
+    FILE * f_in;
+    FILE * f_out;
+
+    double * values;
+    char text[20];
+    char * ptr;
+    int j;
+    
     if (process_opts(argc, argv) == -1) {
         printf("[ ERROR] Error parsing options.\n");
         print_help();
         return -1;
     }
 
-    
-//printf("Reading data...\n");
-//Data * d = data_from_file("../data/databases/problema_real1.txt");
-//data_free(d);
+    switch (mode) {
+    case MODE_SIMULATE:
+        printf("Mode not implemented.\n");
+        return 0;
+    case MODE_CLASSIFY:
+        printf("Mode not implemented.\n");
+        return 0;
+    case MODE_PRESET:
+        switch (preset) {
+        case PRESET_MCCULLOCH:
+            nn = nn_read_from_file(P_MCCULLOCH_NEURAL);
+            if (!nn) {
+                printf("[ ERROR] Error reading neural network file.\n");
+                return -1;
+            }
+            nn->upd_neuron = upd_neuron_mcculloch_pitts;
+            values = (double*) malloc(3 * sizeof(double));
+            if (input_file) {
+                f_in = fopen(input_file, "r");
+            } else {
+                f_in = fopen(P_MCCULLOCH_INPUT,"r");
+            }
+            if (!f_in) {
+                printf("[ ERROR] Error opening input file.\n");
+                nn_free(nn);
+                return -1;
+            }
+            if (output_file) {
+                f_out = fopen(output_file, "w");
+            } else {
+                f_out = fopen(P_MCCULLOCH_OUTPUT ,"w");
+            }
+            if (!f_out) {
+                printf("[ ERROR] Error opening output file.\n");
+                fclose(f_in);
+                nn_free(nn);
+                return -1;
+            }
+            
+            while(fgets(text,20,f_in)){
+                ptr = strtok(text,SEP);
+                values[0] = atof(ptr);
+                for(j=1 ; j < 3; j++){
+                    ptr = strtok(NULL,SEP);
+                    values[j] = atof(ptr); 
+                }
+                nn_update(nn, values, 3, 1);
+                fprint_output(nn, f_out);
+            }
 
-/*Ejercicio 1*/
-/*TODO Poner esto prezi, el formato de entrada no es el formato de data.h por eso esto es a mano*/
-    printf("Creating network\n");
-    Neural_Network * nn = nn_read_from_file("../data/models/McCulloch-Pitts.txt");
-    nn->upd_neuron = upd_neuron_mcculloch_pitts;
-    double * values = (double*)malloc(3*sizeof(double));
-    FILE * f =fopen("../data/databases/McCulloch-Pitts.txt","r");
-    char text[20];
-    char * ptr;
-    int j;
-    while(fgets(text,20,f)){
-        ptr = strtok(text,SEP);
-        values[0] = atof(ptr);
-        for(j=1 ; j < 3; j++){
-            ptr = strtok(NULL,SEP);
-            values[j] = atof(ptr); 
+            nn_free(nn);
+            fclose(f_in);
+            fclose(f_out);
+            
+            break;
         }
-        nn_update(nn, values, 3, 1);
+        return 0;
     }
     
-
-
-    
-    if (nn) {
-        printf("Neural network successfully created\n");
-//print_output(nn);
-        nn_free(nn);
-    } else {
-        printf("Error reading from file\n");
-    }
-
     
     return 0;
 }

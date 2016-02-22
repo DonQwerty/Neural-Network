@@ -56,7 +56,7 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
    0.0 0.0 1.0 1.0 1.0 0.0
    
 */
-Neural_Network * nn_read_from_file(char * file);
+Neural_Network * nn_read_from_file(const char * file);
 
 /* Reads a neural network from stdin, asking for each layer's weights */
 int nn_read_from_stdin(Neural_Network * nn);
@@ -71,7 +71,7 @@ void nn_free(Neural_Network * nn);
 int nn_keep_value_neurons(Neural_Network * nn);
 
 /*Prints the last layer of the neural network*/
-void print_output(Neural_Network * nn);
+void fprint_output(Neural_Network * nn, FILE * f);
 
 /*Set a entry for the neural network*/
 void set_entry_neural_network(Neural_Network * nn, double * values, int n_values);

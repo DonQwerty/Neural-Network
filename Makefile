@@ -28,9 +28,11 @@ LINKER		= gcc -o
 LFLAGS		= -Wall -I$(IDIR)
 # Others
 rm			= rm -f
+ln          = ln -s
 
 # Compiles all programs in project
 compile: $(BDIR)/$(TARGET)
+	@$(ln) $(BDIR)/$(TARGET) $(TARGET)
 	@echo "INFO: All targets compiled"
 
 $(BDIR)/$(TARGET): $(OBJECTS)

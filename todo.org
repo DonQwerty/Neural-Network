@@ -1,3 +1,8 @@
+* FIXMEs
+** MAIN
+*** TODO STRDUPS
+    Cambiar strdup for strncpy
+
 * Programa Principal
 ** DONE Argumentos
    - mode
@@ -9,6 +14,8 @@
    - output-file: archivo donde escribir la salida de la clasificación.
 
 * Clasificador
+** TODO Inicializar
+   Crear conexiones entre neuronas en base al tipo de red
 ** DONE Consideraciones de Diseño
 *** Data Sets
     - Usual data division:
@@ -36,7 +43,7 @@
     - Training set mean squared error
     - Generalization set mean squared error
 
-** IN-PROGRESS Interface
+** DONE Interface
 *** Variables
 **** Classifier
     - Neural_Network nn;

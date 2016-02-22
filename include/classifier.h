@@ -63,6 +63,9 @@ int nnc_train_network(Classifier * c);
 /* Deletes the classifier and the neural network and frees its memory */
 int nnc_free(Classifier * c);
 
+
+
+
 /* Private Methods */
 void nnc_run_training_epoch(Classifier * c);
 
