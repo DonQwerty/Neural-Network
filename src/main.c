@@ -35,9 +35,6 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-
-
-
     
 //printf("Reading data...\n");
 //Data * d = data_from_file("../data/databases/problema_real1.txt");
