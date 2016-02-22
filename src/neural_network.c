@@ -162,7 +162,7 @@ void fprint_output(Neural_Network * nn, FILE * f){
     fprintf(f, "\n");
 }
 
-void nn_update(Neural_Network * nn, double * values, int n_values, int discrete){
+void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int discrete){
     int i;
     set_entry_neural_network(nn, values, n_values);
     for (i = n_values; i < nn->n_neurons; i++) {
@@ -170,6 +170,13 @@ void nn_update(Neural_Network * nn, double * values, int n_values, int discrete)
     }
 	if(discrete)
 		nn_keep_value_neurons(nn);
+}
+
+void nn_update_weights(Neural_Network * nn, double alpha, double * t){
+    int i;
+    for (i = nn->n_neurons -1; i >= 0; i--) {
+        (*nn->upd_weight)(&nn_array(nn)[i], alpha , t[i]);
+    }
 }
 
 
@@ -256,6 +263,19 @@ int neuron_update(Neuron * n) {
     return 0;
 }
 
+double * nn_get_output(Neural_Network nn){
+    int i;
+    int n = nn.layers[nn.n_layers-1].n_neurons;
+    double * values = (double *) malloc(n * sizeof(double));
+
+    if (!values) return NULL;
+
+    for( i = 0 ; i< n ; i++ ){
+        values[i] = nn.layers[nn.n_layers-1].neurons[i].d;
+    }
+    return values;
+}
+
 /*Getters */
 int n_neurons_nn_get(Neural_Network n){
 	return n.n_neurons;
@@ -314,4 +334,11 @@ void new_value_neuron_set(Neuron * n, double v){
 }
 void weight_connection_set(Connection * c, double weight){
 	c->weight = weight;
+}
+
+void nn_set_function_weight(Neural_Network * nn, nn_upd_weight upd){
+    nn->upd_weight = upd;
+}
+void nn_set_function_neuron(Neural_Network * nn, nn_upd_neuron upd){
+    nn->upd_neuron = upd;
 }

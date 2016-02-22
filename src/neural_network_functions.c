@@ -62,6 +62,7 @@ void upd_neuron_adeline (Neuron * neuron){
 
 void upd_weights_perceptron (Neuron * neuron,double alpha, double t){
 	int i;
+	t = (t == 0) ? -1 : 1;
 	Connection * c=connections_neuron_get(*neuron);
 	for ( i = 0; i < n_cons_neuron_get(*neuron); i++){
 		if(value_neuron_get(*neuron) != t){

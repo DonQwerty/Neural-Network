@@ -4,6 +4,7 @@
 #include <getopt.h>
 
 #include "data.h"
+#include "classifier.h"
 #include "neural_network_functions.h"
 
 /* Global definitions, for options processing */
@@ -37,6 +38,7 @@ void print_help();
 int main(int argc, char *argv[]){
 
     Neural_Network * nn;
+    Data * data;
     FILE * f_in;
     FILE * f_out;
 
@@ -56,7 +58,8 @@ int main(int argc, char *argv[]){
         printf("Mode not implemented.\n");
         return 0;
     case MODE_CLASSIFY:
-        printf("Mode not implemented.\n");
+        /*TODO leer la red neuronal y crear clasificDOR*/
+        data = data_from_file(input_file);
         return 0;
     case MODE_PRESET:
         switch (preset) {
@@ -66,7 +69,7 @@ int main(int argc, char *argv[]){
                 printf("[ ERROR] Error reading neural network file.\n");
                 return -1;
             }
-            nn->upd_neuron = upd_neuron_mcculloch_pitts;
+            nn_set_function_neuron(nn , upd_neuron_mcculloch_pitts);
             values = (double*) malloc(3 * sizeof(double));
             if (input_file) {
                 f_in = fopen(input_file, "r");
@@ -97,7 +100,7 @@ int main(int argc, char *argv[]){
                     ptr = strtok(NULL,SEP);
                     values[j] = atof(ptr); 
                 }
-                nn_update(nn, values, 3, 1);
+                nn_update_neurons(nn, values, 3, 1);
                 fprint_output(nn, f_out);
             }
 

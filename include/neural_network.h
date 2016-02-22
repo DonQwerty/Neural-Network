@@ -19,6 +19,7 @@ typedef struct Neuron_ {
 
 /* Functions definition */
 typedef void (*nn_upd_neuron)(Neuron *);
+typedef void (*nn_upd_weight)(Neuron *, double , double);
 
 typedef struct Neural_Layer_ {
     int n_neurons;                 /* Number of neurons in this layer */
@@ -28,6 +29,7 @@ typedef struct Neural_Layer_ {
 typedef struct Neural_Network_ {
     int n_neurons;                 /* Total number of neurons in the net */
     nn_upd_neuron upd_neuron;      /* Function to compute the new value of a neuron */
+    nn_upd_weight upd_weight;   /* Function to compute the new weight of a connection */
     int n_layers;                  /* Number of layers in the network (including in/out) */
     Neural_Layer * layers;         /* Layers array */
 } Neural_Network;
@@ -77,7 +79,10 @@ void fprint_output(Neural_Network * nn, FILE * f);
 void set_entry_neural_network(Neural_Network * nn, double * values, int n_values);
 
 /*Updates the neural network*/
-void nn_update(Neural_Network * nn, double * values, int n_values, int discrete);
+void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int discrete);
+
+/*Updates the neural network weights*/
+void nn_update_weights(Neural_Network * nn, double alpha, double * t);
 
 
 
@@ -101,6 +106,8 @@ int neuron_init(Neuron * n,double threshold);
 /* Updates the values for a neuron */
 int neuron_update(Neuron * n);
 
+/*Return the last layer of the neural network*/
+double * nn_get_output(Neural_Network nn);
 
 /*Getters */
 int n_neurons_nn_get(Neural_Network n);
@@ -126,5 +133,8 @@ void value_neuron_set(Neuron * n, double v);
 void new_value_neuron_set(Neuron * n, double v);
 
 void weight_connection_set(Connection * c, double weight);
+
+void nn_set_function_weight(Neural_Network * nn, nn_upd_weight upd);
+void nn_set_function_neuron(Neural_Network * nn, nn_upd_neuron upd);
 
 #endif /* NEURAL_NETWORK_H */

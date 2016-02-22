@@ -31,7 +31,7 @@ void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen){
 	free(data);
 }
 
-Data * data_from_file(char * file){
+Data * data_from_file(char * file, int percep){
     FILE * f = fopen(file,"r");
     if(!f){
         perror( file);
@@ -56,11 +56,13 @@ Data * data_from_file(char * file){
 
     int i=0;
     while(!fgets(text,100,f)){
-        sample_fill(data->samples[i],text);
+        sample_fill(data->samples[i],text, percep);
         i++;
     }
     return data;
 }
+
+
 
 void data_free(Data * d){
     int i;
@@ -83,7 +85,7 @@ Sample * sample_new(int n_attrs,int n_classes){
   return sample;
 }
 
-void sample_fill(Sample * sample, char * text){
+void sample_fill(Sample * sample, char * text, int percep){
     int i,j;
     int class;
     char * ptr = NULL;
@@ -92,6 +94,12 @@ void sample_fill(Sample * sample, char * text){
     for(i=1 ; i < sample->n_attrs ; i++){
         ptr = strtok(NULL,SEP);
         sample->values[i] = atof(ptr);
+    }
+    if(percep){
+      ptr = strtok(NULL,SEP);
+      class = atoi(ptr); 
+      sample->values[i] =(class == 1 ) ? 1 :  -1;
+      return; 
     }
     for(j=i ; j < sample->n_classes ; j++){
         ptr = strtok(NULL,SEP);
@@ -147,6 +155,8 @@ void n_classes_set(Data * d, int n_classes){
 
 
 /* Getter */
+
+
 int data_get_n_classes(Data  d){
 	return d.n_classes ;
 }
@@ -169,4 +179,8 @@ int sample_get_n_classes(Sample  s){
 
 double * sample_get_values(Sample  s){
 	return s.values ;
+}
+
+int sample_get_class(Sample s){
+  return (int)s.values[s.n_attrs];
 }

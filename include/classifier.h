@@ -1,8 +1,9 @@
 #ifndef CLASSIFIER_H
 #define CLASSIFIER_H
-
+#include  <stdio.h>
 #include "data.h"
 #include "neural_network.h"
+#include "neural_network_functions.h"
 
 /* Default Values */
 #define DEF_TRAINIG_PERCENT        60.0
@@ -21,14 +22,17 @@ typedef struct Classifier_ {
     Data           * data_generalization;
     Data           * data_validation;
     int              epoch;
+
     
     /* Classifier Parameters */
     double learning_rate;
     int    max_epochs;
     double max_accuracy;
     double max_mse;
+    int bipolar;
     
     /* Epoch Statistics */
+    FILE * file_statistics;
     /* Accuracy */
     double accuracy_training;
     double accuracy_generalization;
@@ -48,7 +52,7 @@ typedef struct Classifier_ {
 Classifier * nnc_new();
 
 /* Changes the parameters. If NULL, the default value is used */
-int nnc_set_training_parameters(Classifier * c, double learning_rate);
+int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar);
 
 /* Receives the data and divides it into training, generalization and validation */
 // TODO What does this receive? The file? The Data *?
@@ -63,11 +67,15 @@ int nnc_train_network(Classifier * c);
 /* Deletes the classifier and the neural network and frees its memory */
 int nnc_free(Classifier * c);
 
-
+/*Sets the neural network*/
+int nnc_set_neural_network(Classifier * c, Neural_Network * nn);
 
 
 /* Private Methods */
 void nnc_run_training_epoch(Classifier * c);
+
+void nnc_run_statistics(Classifier * c, int epoch);
+
 
 
 #endif /* CLASSIFIER_H */
