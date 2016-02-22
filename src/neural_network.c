@@ -3,7 +3,7 @@
 #include "neural_network.h"
 
 /* Public Methods */
-Neural_Network * nn_new(int n_layers, int * n_neurons_layer, int * thresholds) {
+Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds) {
     Neural_Network * nn;
     Neuron * neurons_arr;
     int n_neurons_total;
@@ -55,7 +55,8 @@ Neural_Network * nn_read_from_file(char * file) {
     Neural_Network * nn;
     FILE * f;
     int n_layers, n_neurons;
-    int * n_neurons_layer, *thresholds;
+    int * n_neurons_layer;
+	double * thresholds;
     double * cons;
     int i, j, count;
     
@@ -94,9 +95,9 @@ Neural_Network * nn_read_from_file(char * file) {
     }
     /* thresholds */
     printf("[ INFO ]     Thresholds: ");
-    thresholds = (int * ) malloc(n_neurons * sizeof(int));
+    thresholds = (double * ) malloc(n_neurons * sizeof(double));
     for (i = 0; i < n_neurons; i++) {
-        count = fscanf(f, "%d", thresholds + i);
+        count = fscanf(f, "%lf", thresholds + i);
         if (count == EOF) {
             if (ferror(f)) {
                 free(thresholds);
@@ -104,7 +105,7 @@ Neural_Network * nn_read_from_file(char * file) {
                 return NULL;
             }
         }
-        printf("%d ", thresholds[i]);
+        printf("%lf ", thresholds[i]);
     }
     printf("\n");
 
@@ -240,7 +241,7 @@ int layer_init(Neural_Layer * l, int n_neurons, Neuron * first) {
 }
 
 /* Neuron Methods */
-int neuron_init(Neuron * n, int threshold) {
+int neuron_init(Neuron * n, double threshold) {
     if (!n) return -1;
     n->d = 0.0;
     n->d_new = 0.0;
@@ -255,4 +256,64 @@ int neuron_update(Neuron * n) {
     n->d = n->d_new;
     n->d_new = 0.0;
     return 0;
+}
+
+/*Getters */
+int n_neurons_nn_get(Neural_Network * n){
+	return n->n_neurons;
+}
+int n_layers_get(Neural_Network * n){
+	return n->n_layers;
+}
+
+Neural_Layer * layers_get(Neural_Network * n){
+	return n->layers;
+}
+
+int n_neurons_layer_get(Neural_Layer * nl){
+	return nl->n_neurons;
+}
+Neuron * neurons_layer_get(Neural_Layer * nl){
+	return nl->neurons;
+}
+
+double value_neuron_get(Neuron * n){
+	return n->d;
+}
+
+double new_value_neuron_get(Neuron * n){
+	return n->d_new;
+}
+
+int n_cons_neuron_get(Neuron * n){
+	return n->n_cons;
+}
+
+double threshold_neuron_get(Neuron * n){
+	return n->threshold;
+}
+
+Connection * connections_neuron_get(Neuron * n){
+	return n->cons;
+}
+
+double weight_connecion_get(Connection  c){
+	return c.weight;
+}
+
+Neuron *  neuron_from_connecion_get(Connection  c){
+	return c.from;
+}
+
+/*Setters*/
+
+void value_neuron_set(Neuron * n, double v){
+	n->d = v;
+}
+
+void new_value_neuron_set(Neuron * n, double v){
+	n->d_new = v;
+}
+void weight_connection_set(Connection * c, double weight){
+	c->weight = weight;
 }

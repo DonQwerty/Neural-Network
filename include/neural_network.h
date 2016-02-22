@@ -13,7 +13,7 @@ typedef struct Neuron_ {
     double d_new;                  /* Neuron's value */
     double err;                    /* Error, for training purposes */
     int n_cons;                    /* Number of connections */
-    int threshold;                 
+    double threshold;                 
     Connection * cons;             /* Neuron's connections */
 } Neuron;
 
@@ -36,7 +36,7 @@ typedef struct Neural_Network_ {
 /* Public Methods */
 /* Allocates memory for the neural network with n layers and
    n_neurons_layer per layer (includind first/last layers) */
-Neural_Network * nn_new(int n_layers, int * n_neurons_layer, int * thresholds);
+Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds);
 
 /* Reads a neural network from a file.
    Supposing we have the following network with 3 layers:
@@ -97,9 +97,34 @@ int layer_init(Neural_Layer * l, int n_neurons, Neuron * first);
 
 /* Neuron methods */
 /* Sets the default values for a neuron */
-int neuron_init(Neuron * n,int threshold);
+int neuron_init(Neuron * n,double threshold);
 /* Updates the values for a neuron */
 int neuron_update(Neuron * n);
 
+
+/*Getters */
+int n_neurons_nn_get(Neural_Network * n);
+int n_layers_get(Neural_Network * n);
+Neural_Layer * layers_get(Neural_Network * n);
+
+int n_neurons_layer_get(Neural_Layer * nl);
+Neuron * neurons_layer_get(Neural_Layer * nl);
+
+double value_neuron_get(Neuron * n);
+double new_value_neuron_get(Neuron * n);
+int n_cons_neuron_get(Neuron * n);
+double threshold_neuron_get(Neuron * n);
+Connection * connections_neuron_get(Neuron * n);
+
+double weight_connecion_get(Connection  c);
+Neuron *  neuron_from_connecion_get(Connection  c);
+
+
+/*Setters*/
+
+void value_neuron_set(Neuron * n, double v);
+void new_value_neuron_set(Neuron * n, double v);
+
+void weight_connection_set(Connection * c, double weight);
 
 #endif /* NEURAL_NETWORK_H */

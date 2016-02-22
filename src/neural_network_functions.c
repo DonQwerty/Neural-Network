@@ -8,18 +8,20 @@ void upd_neuron_mcculloch_pitts (Neuron * neuron){
 	int i;
 	double value = 0;
 	double weight;
-	for ( i = 0; i < neuron->n_cons; i++){
-		weight = neuron->cons[i].weight;
+	Connection * c=connections_neuron_get(neuron);
+	for ( i = 0; i < n_cons_neuron_get(neuron); i++){
+		weight = weight_connecion_get(c[i]);
 		if(weight < 0){
 			value = 0;
 			break;
 		}
-		value += weight * neuron->cons[i].from->d;
+		Neuron * n = neuron_from_connecion_get(c[i]);
+		value += weight * value_neuron_get(n);
 	}
-	if(value < neuron->threshold)
-		neuron->d_new = 0;
+	if(value < threshold_neuron_get(neuron))
+		new_value_neuron_set(neuron,0);
 	else
-		neuron->d_new = 1;
+		new_value_neuron_set(neuron,1);
 	return;
 }
 
@@ -27,16 +29,19 @@ void upd_neuron_perceptron (Neuron * neuron){
 	int i;
 	double value = 0;
 	double weight;
-	for ( i = 0; i < neuron->n_cons; i++){
-		weight = neuron->cons[i].weight;
-		value += weight * neuron->cons[i].from->d;
+	Connection * c=connections_neuron_get(neuron);
+	for ( i = 0; i < n_cons_neuron_get(neuron); i++){
+		weight = weight_connecion_get(c[i]);
+		Neuron * n = neuron_from_connecion_get(c[i]);
+		value += weight * value_neuron_get(n);
 	}
-	if(value < (-neuron->threshold))
-		neuron->d = -1;
-	else if (value > neuron->threshold)
-		neuron->d = 1;
+	double threshold = threshold_neuron_get(neuron);
+	if(value < (-threshold))
+		value_neuron_set(neuron,-1);
+	else if (value > threshold)
+		value_neuron_set(neuron,1);
 	else
-		neuron->d = 0;
+		value_neuron_set(neuron,0);
 	return;
 }
 
@@ -44,28 +49,35 @@ void upd_neuron_adeline (Neuron * neuron){
 	int i;
 	double value = 0;
 	double weight;
-	for ( i = 0; i < neuron->n_cons; i++){
-		weight = neuron->cons[i].weight;
-		value += weight * neuron->cons[i].from->d;
+	Connection * c=connections_neuron_get(neuron);
+	for ( i = 0; i < n_cons_neuron_get(neuron); i++){
+		weight = weight_connecion_get(c[i]);
+		Neuron * n = neuron_from_connecion_get(c[i]);
+		value += weight * value_neuron_get(n);
 	}
-	neuron->d = value;
+	value_neuron_set(neuron,value);
 	return;
 }
 
 
 void upd_weights_perceptron (Neuron * neuron,double alpha, double t){
 	int i;
-	for ( i = 0; i < neuron->n_cons; i++){
-		if(neuron->d != t)
-			neuron->cons[i].weight = neuron->cons[i].weight + alpha * t * neuron->cons[i].from->d;
+	Connection * c=connections_neuron_get(neuron);
+	for ( i = 0; i < n_cons_neuron_get(neuron); i++){
+		if(value_neuron_get(neuron) != t){
+			Neuron * n = neuron_from_connecion_get(c[i]);
+			weight_connection_set(&c[i] , weight_connecion_get(c[i]) + alpha * t * value_neuron_get(n));
+		}
 	}
 	return;
 }
 
 void upd_weights_adeline (Neuron * neuron,double alpha, double t){
 	int i;
-	for ( i = 0; i < neuron->n_cons; i++){
-			neuron->cons[i].weight = neuron->cons[i].weight + alpha * (t - neuron->d) * neuron->cons[i].from->d;
+	Connection * c=connections_neuron_get(neuron);
+	for ( i = 0; i < n_cons_neuron_get(neuron); i++){
+			Neuron * n = neuron_from_connecion_get(c[i]);
+			weight_connection_set(&c[i] , weight_connecion_get(c[i]) + alpha * (t - value_neuron_get(neuron)) * value_neuron_get(n));
 	}
 	return;
 }
