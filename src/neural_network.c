@@ -174,8 +174,8 @@ void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int d
 
 void nn_update_weights(Neural_Network * nn, double alpha, double * t){
     int i;
-    for (i = nn->n_neurons -1; i >= 0; i--) {
-        (*nn->upd_weight)(&nn_array(nn)[i], alpha , t[i]);
+    for (i = nn->n_neurons -1; i >= nn->n_neurons -2; i--) { //TODO cambiar estooo
+        (*nn->upd_weight)(&nn_array(nn)[i], alpha , t[nn->n_neurons-i-1]);
     }
 }
 
@@ -341,4 +341,5 @@ void nn_set_function_weight(Neural_Network * nn, nn_upd_weight upd){
 }
 void nn_set_function_neuron(Neural_Network * nn, nn_upd_neuron upd){
     nn->upd_neuron = upd;
+
 }

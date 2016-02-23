@@ -6,7 +6,6 @@
 /* Public Methods */
 Classifier * nnc_new() {
     Classifier * c;
-
     c = (Classifier *) malloc(sizeof(Classifier));
     if (!c) return NULL;
 
@@ -32,7 +31,6 @@ Classifier * nnc_new() {
     c->mse_training = 0.0;
     c->mse_generalization = 0.0;
     c->mse_validation = 0.0;
-
     return c;
 }
 
@@ -52,10 +50,20 @@ int nnc_set_neural_network(Classifier * c, Neural_Network * nn){
 
 int nnc_set_data(Classifier * c, Data * d) {
     if (!c || !d) return -1;
-
-    train_and_test_from_data(d , c->data_training , c->data_validation, DEF_TRAINIG_PERCENT);
+    train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, DEF_TRAINIG_PERCENT);
     
     return 0;
+}
+
+int nnc_free(Classifier * c){
+	if(!c)
+		return -1;
+	fclose(c->file_statistics );
+	nn_free(c->nn);
+	data_free(c->data_training);
+	free(c);
+	return 0;
+	
 }
 
 int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accuracy, double max_mse) {
@@ -69,12 +77,37 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 }
 
 int nnc_train_network(Classifier * c){
-    int i;
-    for ( i = 0; i < c->epoch; i++){
+	
+    while(c->epoch < c->max_epochs){
+		printf("---Epoca %d--\n" , c->epoch);
+	fflush(stdout);
         nnc_run_training_epoch(c);
-        nnc_run_statistics(c, i);
+        nnc_run_statistics(c);
+		c->epoch++;
     }
     return 0;
+}
+
+double nnc_classifier(Classifier * c){
+    int i;
+	double * output;
+	int s = 0;
+	int n_clases = data_get_n_classes(*c->data_training);
+    for ( i = 0; i < data_get_n_samples(*(c->data_validation)); i++){
+        Sample * s = data_get_samples(*(c->data_training))[i];
+		int n_attrs = sample_get_n_attrs(*s);
+		nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0); 
+		output = nn_get_output(*c->nn);
+		if(n_clases == 2 && c->bipolar==1){
+            if(output[0] == sample_get_class(*s))
+                s++;
+        }
+        else{
+            if(output[sample_get_class(*s)] == 1)
+                s++;
+        }
+    }
+    return ((double) s * 100)/data_get_n_samples(*(c->data_validation));
 }
 
 /* Private Methods */
@@ -82,14 +115,18 @@ int nnc_train_network(Classifier * c){
 void nnc_run_training_epoch(Classifier * c){
 	int i , j;
     double * values;
+	Sample * s;
+	printf("---sasa--\n");
+	fflush(stdout);
+	
     int n_clases = data_get_n_classes(*c->data_training);
+	printf("%d --aa\n",n_clases);
+	fflush(stdout);
+	values = (double *) malloc(n_clases* sizeof(double));
 	for( i = 0 ; i < data_get_n_samples(*(c->data_training)) ; i++){
-		Sample * s = data_get_samples(*(c->data_training))[i];
+		s = data_get_samples(*(c->data_training))[i];
 		int n_attrs = sample_get_n_attrs(*s);
 		nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0); 
-        values = (double *) malloc(n_clases* sizeof(double));
-
-
         if(n_clases == 2 && c->bipolar==1){
             values[0] = sample_get_class(*s);
         }
@@ -100,10 +137,14 @@ void nnc_run_training_epoch(Classifier * c){
             values[sample_get_class(*s)] = 1;
         }
         nn_update_weights(c->nn, c->learning_rate, values);
+
 	}
+	printf("dsdsd --aa\n");
+	fflush(stdout);
+	free(values);
 }
 
-void nnc_run_statistics(Classifier * c, int epoch){
+void nnc_run_statistics(Classifier * c){
     int i ;
     int s = 0; 
     double * output;
@@ -124,6 +165,6 @@ void nnc_run_statistics(Classifier * c, int epoch){
         }
         
     }
-    fprintf(c->file_statistics, "%d;%lf\n",epoch , ((double) s*100 )/ data_get_n_samples(*(c->data_training)));
+    fprintf(c->file_statistics, "%d;%lf\n",c->epoch , ((double) s*100 )/ data_get_n_samples(*(c->data_training)));
 }
 

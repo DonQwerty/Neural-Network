@@ -41,12 +41,12 @@ int main(int argc, char *argv[]){
     Data * data;
     FILE * f_in;
     FILE * f_out;
-
+	Classifier * nnc;
     double * values;
     char text[20];
     char * ptr;
     int j;
-    
+    int n_attrs, n_clases;
     if (process_opts(argc, argv) == -1) {
         printf("[ ERROR] Error parsing options.\n");
         print_help();
@@ -59,7 +59,26 @@ int main(int argc, char *argv[]){
         return 0;
     case MODE_CLASSIFY:
         /*TODO leer la red neuronal y crear clasificDOR*/
-        data = data_from_file(input_file);
+        data = data_from_file(input_file,1);
+		n_attrs = sample_get_n_attrs(*(data_get_samples(*data)[0]));
+		n_clases = data_get_n_classes(*data);
+		nn = nn_read_from_file("data/models/prueba1.txt");
+		if (!nn) {
+                printf("[ ERROR] Error reading neural network file.\n");
+                return -1;
+            }
+		nn_set_function_neuron(nn , upd_neuron_perceptron);
+		nn_set_function_weight(nn , upd_weights_perceptron);
+		fflush(stdout);
+		nnc = nnc_new();
+		nnc_set_data(nnc, data);
+		nnc_set_neural_network(nnc , nn);
+		nnc_set_training_parameters(nnc , 0 , 1);
+		nnc_train_network(nnc);
+		nnc_classifier(nnc);
+						printf("en antes de free\n");
+		fflush(stdout);
+		nnc_free(nnc);
         return 0;
     case MODE_PRESET:
         switch (preset) {

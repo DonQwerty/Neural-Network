@@ -6,14 +6,13 @@
 
 /* Public Methods */
 
-void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen){
+void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen){
 	int i,r,n;
 	int index;
 	Sample * aux;
 	n = data->n_samples;
-
-	train = data_new();
-	test = data_new();
+	*train = data_new();
+	*test = data_new();
 	srand(time(NULL));
 	for (i = 0 ; i < n ; i++){
 		r = rand()%(n-i);
@@ -22,12 +21,12 @@ void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen){
         data->samples[r+i] =  aux;
 	}
 	index = (porcen* n)/100;
-	n_samples_set(train,index);
-	n_samples_set(test, n - index);
-	n_classes_set(train,data->n_classes);
-	n_classes_set(test,data->n_classes);
-	train->samples = data->samples;
-	test->samples = data->samples + index;
+	n_samples_set(*train,index);
+	n_samples_set(*test, n - index);
+	n_classes_set(*train,data->n_classes);
+	n_classes_set(*test,data->n_classes);
+	(*train)->samples = data->samples;
+	(*test)->samples = data->samples + index;
 	free(data);
 }
 
@@ -39,11 +38,10 @@ Data * data_from_file(char * file, int percep){
     }
     char text[100];
     int n_samples=-1;
-    while(!fgets(text,100,f)){
+    while(fgets(text,100,f)){
         n_samples++;
     }
     rewind(f);
-    
     fgets(text,100,f);
     char * ptr = NULL;
     ptr = strtok(text," ");
@@ -53,9 +51,8 @@ Data * data_from_file(char * file, int percep){
 
     Data * data=data_new();
     data_init(data,n_classes,n_samples,n_attrs);
-
     int i=0;
-    while(!fgets(text,100,f)){
+    while(fgets(text,100,f)){
         sample_fill(data->samples[i],text, percep);
         i++;
     }
@@ -108,6 +105,7 @@ void sample_fill(Sample * sample, char * text, int percep){
             sample->values[i]=j-i;
         }
     }
+	
 }
 
 void sample_free(Sample * sample){

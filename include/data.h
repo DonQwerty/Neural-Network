@@ -16,7 +16,7 @@ typedef struct Data_ {
 } Data;
 
 /* Public Methods */
-void train_and_test_from_data(Data * train,Data * test, Data * data,int porcen);
+void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen);
 Data * data_from_file(char * file,int percep);
 void data_free(Data * d);
 

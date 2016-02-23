@@ -10,7 +10,7 @@
 #define DEF_GENERALIZATION_PERCENT 20.0
 #define DEF_VALIDATION_PERCENT     20.0
 #define DEF_LEARNING_RATE          0.2
-#define DEF_MAX_EPOCHS             1500
+#define DEF_MAX_EPOCHS             100
 #define DEF_MAX_ACCURACY           95
 #define DEF_MAX_MSE                0.001
 
@@ -64,6 +64,9 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 /* Trains the network until a stopping condition is reached */
 int nnc_train_network(Classifier * c);
 
+/*Classifies the data validation and return the success rate*/
+double nnc_classifier(Classifier * c);
+
 /* Deletes the classifier and the neural network and frees its memory */
 int nnc_free(Classifier * c);
 
@@ -74,7 +77,7 @@ int nnc_set_neural_network(Classifier * c, Neural_Network * nn);
 /* Private Methods */
 void nnc_run_training_epoch(Classifier * c);
 
-void nnc_run_statistics(Classifier * c, int epoch);
+void nnc_run_statistics(Classifier * c);
 
 
 
