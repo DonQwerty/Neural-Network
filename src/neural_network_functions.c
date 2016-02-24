@@ -29,11 +29,13 @@ void upd_neuron_perceptron (Neuron * neuron){
 	int i;
 	double value = 0;
 	double weight;
+
 	Connection * c=connections_neuron_get(*neuron);
 	for ( i = 0; i < n_cons_neuron_get(*neuron); i++){
 		weight = weight_connecion_get(c[i]);
 		Neuron * n = neuron_from_connecion_get(c[i]);
 		value += weight * value_neuron_get(*n);
+		
 	}
 	double threshold = threshold_neuron_get(*neuron);
 	if(value < (-threshold))
@@ -62,7 +64,7 @@ void upd_neuron_adeline (Neuron * neuron){
 
 void upd_weights_perceptron (Neuron * neuron,double alpha, double t){
 	int i;
-	t = (t == 0) ? -1 : 1;
+	//t = (t == 0) ? -1 : 1;
 	Connection * c=connections_neuron_get(*neuron);
 	for ( i = 0; i < n_cons_neuron_get(*neuron); i++){
 		if(value_neuron_get(*neuron) != t){

@@ -62,22 +62,22 @@ int main(int argc, char *argv[]){
         data = data_from_file(input_file,1);
 		n_attrs = sample_get_n_attrs(*(data_get_samples(*data)[0]));
 		n_clases = data_get_n_classes(*data);
-		nn = nn_read_from_file("data/models/prueba1.txt");
+		nn = nn_read_from_file("data/models/prueba2.txt");
 		if (!nn) {
                 printf("[ ERROR] Error reading neural network file.\n");
                 return -1;
             }
+		//nn_set_function_neuron(nn , upd_neuron_adeline);
 		nn_set_function_neuron(nn , upd_neuron_perceptron);
+		//nn_set_function_weight(nn , upd_weights_adeline);
 		nn_set_function_weight(nn , upd_weights_perceptron);
 		fflush(stdout);
 		nnc = nnc_new();
 		nnc_set_data(nnc, data);
 		nnc_set_neural_network(nnc , nn);
-		nnc_set_training_parameters(nnc , 0 , 1);
+		nnc_set_training_parameters(nnc , 0 , 1,0);
 		nnc_train_network(nnc);
 		nnc_classifier(nnc);
-						printf("en antes de free\n");
-		fflush(stdout);
 		nnc_free(nnc);
         return 0;
     case MODE_PRESET:
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]){
                     ptr = strtok(NULL,SEP);
                     values[j] = atof(ptr); 
                 }
-                nn_update_neurons(nn, values, 3, 1);
+                nn_update_neurons(nn, values, 3, 1,0);
                 fprint_output(nn, f_out);
             }
 

@@ -1,0 +1,6 @@
+[ INFO ] Mode: classify
+[ INFO ] Input file: data/databases/problema_real2.txt
+[ INFO ] Creating network with 2 layers
+[ INFO ]     Neurons per layer: 10 1 
+[ INFO ]     Thresholds: 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 
+---Epoca 0--

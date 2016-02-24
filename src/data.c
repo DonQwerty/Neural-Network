@@ -91,18 +91,21 @@ void sample_fill(Sample * sample, char * text, int percep){
     for(i=1 ; i < sample->n_attrs ; i++){
         ptr = strtok(NULL,SEP);
         sample->values[i] = atof(ptr);
+
     }
     if(percep){
       ptr = strtok(NULL,SEP);
       class = atoi(ptr); 
-      sample->values[i] =(class == 1 ) ? 1 :  -1;
+      
+      sample->values[i] =(class == 1 ) ? -1 :  1;
       return; 
     }
-    for(j=i ; j < sample->n_classes ; j++){
+
+    for(j=0 ; j < sample->n_classes ; j++){
         ptr = strtok(NULL,SEP);
         class = atoi(ptr); 
         if(class==1){
-            sample->values[i]=j-i;
+            sample->values[i]=j;
         }
     }
 	

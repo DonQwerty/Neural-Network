@@ -9,7 +9,7 @@
 #define DEF_TRAINIG_PERCENT        60.0
 #define DEF_GENERALIZATION_PERCENT 20.0
 #define DEF_VALIDATION_PERCENT     20.0
-#define DEF_LEARNING_RATE          0.2
+#define DEF_LEARNING_RATE          0.02
 #define DEF_MAX_EPOCHS             100
 #define DEF_MAX_ACCURACY           95
 #define DEF_MAX_MSE                0.001
@@ -30,6 +30,7 @@ typedef struct Classifier_ {
     double max_accuracy;
     double max_mse;
     int bipolar;
+    int function_transfer;
     
     /* Epoch Statistics */
     FILE * file_statistics;
@@ -52,7 +53,7 @@ typedef struct Classifier_ {
 Classifier * nnc_new();
 
 /* Changes the parameters. If NULL, the default value is used */
-int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar);
+int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar, int function_transfer);
 
 /* Receives the data and divides it into training, generalization and validation */
 // TODO What does this receive? The file? The Data *?

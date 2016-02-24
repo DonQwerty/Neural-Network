@@ -162,10 +162,23 @@ void fprint_output(Neural_Network * nn, FILE * f){
     fprintf(f, "\n");
 }
 
-void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int discrete){
+void fprint_w(Neural_Network * nn, FILE * f){
     int i;
-    set_entry_neural_network(nn, values, n_values);
-    for (i = n_values; i < nn->n_neurons; i++) {
+   // printf("%d\n",nn_array(nn)[10].n_cons);
+    for(i = 0; i < nn_array(nn)[10].n_cons ; i++){
+        //fprintf(f, "%lf\t", nn_array(nn)[10].cons[i].weight);
+    }
+    for(i = 0; i < nn_array(nn)[11].n_cons ; i++){
+       // fprintf(f, "%lf\t", nn_array(nn)[11].cons[i].weight);
+    }
+   // fprintf(f, "\n\n");
+}
+
+
+void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int discrete, int sesg){
+    int i;
+    set_entry_neural_network(nn, values, n_values, discrete,  sesg);
+    for (i = n_values + sesg; i < nn->n_neurons; i++) {
         (*nn->upd_neuron)(&nn_array(nn)[i]);
     }
 	if(discrete)
@@ -173,9 +186,10 @@ void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int d
 }
 
 void nn_update_weights(Neural_Network * nn, double alpha, double * t){
-    int i;
-    for (i = nn->n_neurons -1; i >= nn->n_neurons -2; i--) { //TODO cambiar estooo
-        (*nn->upd_weight)(&nn_array(nn)[i], alpha , t[nn->n_neurons-i-1]);
+    int i,j=0;
+    for (i = nn->n_neurons -1; i >= nn->n_neurons -1; i--) { //TODO cambiar estooo
+        (*nn->upd_weight)(&nn_array(nn)[i], alpha , t[j]);
+        j++;
     }
 }
 
@@ -228,12 +242,16 @@ int nn_keep_value_neurons(Neural_Network * nn){
 
 
 
-void set_entry_neural_network(Neural_Network * nn, double * values, int n_values){
+void set_entry_neural_network(Neural_Network * nn, double * values, int n_values, int discrete, int sesg){
     int i;
     /* Init values */
     for (i = 0; i < n_values; i++) {
-        nn_array(nn)[i].d_new = values[i];
+    	if(discrete)
+        	nn_array(nn)[i].d_new = values[i];
+       	else
+       		nn_array(nn)[i].d = values[i];
     }
+    if(sesg) nn_array(nn)[i].d = 1;
 }
 
 
@@ -272,7 +290,9 @@ double * nn_get_output(Neural_Network nn){
 
     for( i = 0 ; i< n ; i++ ){
         values[i] = nn.layers[nn.n_layers-1].neurons[i].d;
+        
     }
+ 
     return values;
 }
 

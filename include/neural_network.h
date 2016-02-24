@@ -75,11 +75,13 @@ int nn_keep_value_neurons(Neural_Network * nn);
 /*Prints the last layer of the neural network*/
 void fprint_output(Neural_Network * nn, FILE * f);
 
+void fprint_w(Neural_Network * nn, FILE * f);
+
 /*Set a entry for the neural network*/
-void set_entry_neural_network(Neural_Network * nn, double * values, int n_values);
+void set_entry_neural_network(Neural_Network * nn, double * values, int n_values,int discrete, int sesg);
 
 /*Updates the neural network*/
-void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int discrete);
+void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int discrete, int sesg);
 
 /*Updates the neural network weights*/
 void nn_update_weights(Neural_Network * nn, double alpha, double * t);
