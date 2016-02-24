@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "neural_network.h"
 
+
 /* Public Methods */
 Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds) {
     Neural_Network * nn;
@@ -165,13 +166,13 @@ void fprint_output(Neural_Network * nn, FILE * f){
 void fprint_w(Neural_Network * nn, FILE * f){
     int i;
    // printf("%d\n",nn_array(nn)[10].n_cons);
-    for(i = 0; i < nn_array(nn)[10].n_cons ; i++){
-        //fprintf(f, "%lf\t", nn_array(nn)[10].cons[i].weight);
+    for(i = 0; i < nn_array(nn)[9].n_cons ; i++){
+        fprintf(f, "%lf\t", nn_array(nn)[9].cons[i].weight);
     }
-    for(i = 0; i < nn_array(nn)[11].n_cons ; i++){
+    //for(i = 0; i < nn_array(nn)[11].n_cons ; i++){
        // fprintf(f, "%lf\t", nn_array(nn)[11].cons[i].weight);
-    }
-   // fprintf(f, "\n\n");
+   // }
+    fprintf(f, "\n\n");
 }
 
 

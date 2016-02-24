@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "classifier.h"
 
 /* Public Methods */
@@ -80,9 +81,9 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 
 int nnc_train_network(Classifier * c){
 	
-    while(c->epoch < 5){
+    while(c->epoch < 5000){
 		printf("---Epoca %d--\n" , c->epoch);
-	fflush(stdout);
+		fflush(stdout);
         nnc_run_training_epoch(c);
         nnc_run_statistics(c);
 		c->epoch++;
@@ -95,12 +96,13 @@ double nnc_classifier(Classifier * c){
     double aux;
 	double * output;
 	int sum = 0;
-	int n_clases = data_get_n_classes(*c->data_training);
+	int n_clases = data_get_n_classes(*c->data_validation);
     for ( i = 0; i < data_get_n_samples(*(c->data_validation)); i++){
-        Sample * s = data_get_samples(*(c->data_training))[i];
+        Sample * s = data_get_samples(*(c->data_validation))[i];
 		int n_attrs = sample_get_n_attrs(*s);
 		nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1); 
 		output = nn_get_output(*c->nn);
+		//printf("%lf %lf %lf %lf %lf\n", s->values[0],s->values[1],s->values[2],s->values[3],output[0]);
 		if(n_clases == 2 && c->bipolar==1){
             if(c->function_transfer){
         		if((output[0] >= 0 && sample_get_class(*s)==1) || (output[0] < 0 && sample_get_class(*s)==-1) )
@@ -158,9 +160,9 @@ void nnc_run_training_epoch(Classifier * c){
 	
             values[sample_get_class(*s)] = 1;
         }
-        fprint_w(c->nn,stdout);
+        //fprint_w(c->nn,stdout);
         nn_update_weights(c->nn, c->learning_rate, values);
-        nnc_run_statistics(c);
+        //nnc_run_statistics(c);
 
 	}
 
@@ -172,22 +174,24 @@ void nnc_run_statistics(Classifier * c){
     double aux;
     int sum = 0; 
     double * output;
+	double error=0;
     int n_clases = data_get_n_classes(*c->data_training);
     for( i = 0 ; i < data_get_n_samples(*(c->data_training)) ; i++){
         Sample * s = data_get_samples(*(c->data_training))[i];
         int n_attrs = sample_get_n_attrs(*s);
-        nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1); //TODO el 0 es porque no queremos discreta
+        nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1); 
         output = nn_get_output(*c->nn);
-       // printf("Output ---%lf\n", output[0]);
+        
         if(n_clases == 2 && c->bipolar==1){
         	if(c->function_transfer){
         		if((output[0] >= 0 && sample_get_class(*s)==1) || (output[0] < 0 && sample_get_class(*s)==-1) )
-                	sum++;
+                	sum++;	
         	}
         	else{
         		if(output[0] == sample_get_class(*s))
                 	sum++;
         	}
+			error+= pow(((double)sample_get_class(*s) - output[0]),2);
             
         }
         else{
@@ -204,6 +208,7 @@ void nnc_run_statistics(Classifier * c){
                		sum++;
         	}
         	else{
+				pos = sample_get_class(*s);
         		if(output[sample_get_class(*s)] == 1)
               	  sum++;
         	}
@@ -211,6 +216,6 @@ void nnc_run_statistics(Classifier * c){
         }
         
     }
-    fprintf(c->file_statistics, "%d;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)));
+    fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));
 }
 

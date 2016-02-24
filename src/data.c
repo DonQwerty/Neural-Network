@@ -18,7 +18,7 @@ void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen
 		r = rand()%(n-i);
 		aux =  data->samples[i];
         data->samples[i]= data->samples[r+i];
-        data->samples[r+i] =  aux;
+       data->samples[r+i] =  aux;
 	}
 	index = (porcen* n)/100;
 	n_samples_set(*train,index);

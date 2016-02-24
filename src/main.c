@@ -67,15 +67,15 @@ int main(int argc, char *argv[]){
                 printf("[ ERROR] Error reading neural network file.\n");
                 return -1;
             }
-		//nn_set_function_neuron(nn , upd_neuron_adeline);
-		nn_set_function_neuron(nn , upd_neuron_perceptron);
-		//nn_set_function_weight(nn , upd_weights_adeline);
-		nn_set_function_weight(nn , upd_weights_perceptron);
+		nn_set_function_neuron(nn , upd_neuron_adeline);
+		//nn_set_function_neuron(nn , upd_neuron_perceptron);
+		nn_set_function_weight(nn , upd_weights_adeline);
+		//nn_set_function_weight(nn , upd_weights_perceptron);
 		fflush(stdout);
 		nnc = nnc_new();
 		nnc_set_data(nnc, data);
 		nnc_set_neural_network(nnc , nn);
-		nnc_set_training_parameters(nnc , 0 , 1,0);
+		nnc_set_training_parameters(nnc , 0 , 1,1);
 		nnc_train_network(nnc);
 		nnc_classifier(nnc);
 		nnc_free(nnc);
