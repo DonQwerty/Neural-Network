@@ -25,10 +25,10 @@ CC			= gcc -c
 CFLAGS		= -Wall -I$(IDIR)
 # Linker
 LINKER		= gcc -o
-LFLAGS		= -Wall -I$(IDIR)
+LFLAGS		= -Wall -I$(IDIR) -lm
 # Others
 rm			= rm -f
-ln          = ln -s
+ln          = ln -sf
 
 # Compiles all programs in project
 compile: $(BDIR)/$(TARGET)
@@ -36,16 +36,16 @@ compile: $(BDIR)/$(TARGET)
 	@echo "INFO: All targets compiled"
 
 $(BDIR)/$(TARGET): $(OBJECTS)
-	@$(LINKER) $@ $(LFLAGS) $(OBJECTS)
+	@$(LINKER) $@ $(OBJECTS) $(LFLAGS)
 	@echo "INFO: Linking completed"
 
 $(OBJECTS):$(ODIR)/%.o: $(SDIR)/%.c
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 	@echo "INFO: Compiled "$<" successfully"
 
 # P1.2 MacCulloch-Pitts Network
 p1.2-macculloch-pits:
-	@echo "TODO: p1.2-macculloch-pits"
+	./$(TARGET) --preset macculloch
 
 # P1.3.1 Perceptron
 p1.3.1-perceptron:

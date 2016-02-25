@@ -9,8 +9,8 @@
 
 /* Global definitions, for options processing */
 /* Execution modes */
-#define MODE_SIMULATE     0
-#define MODE_CLASSIFY     1
+#define MODE_PERCEPTRON   0
+#define MODE_ADELINE      1
 #define MODE_PRESET       2
 /* Presets */
 #define PRESET_MCCULLOCH  0
@@ -53,37 +53,15 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    switch (mode) {
-    case MODE_SIMULATE:
-        printf("Mode not implemented.\n");
-        return 0;
-    case MODE_CLASSIFY:
-        /*TODO leer la red neuronal y crear clasificDOR*/
-        data = data_from_file(input_file,1);
-		n_attrs = sample_get_n_attrs(*(data_get_samples(*data)[0]));
-		n_clases = data_get_n_classes(*data);
-		nn = nn_read_from_file("data/models/prueba2.txt");
-		if (!nn) {
-                printf("[ ERROR] Error reading neural network file.\n");
-                return -1;
-            }
-		nn_set_function_neuron(nn , upd_neuron_adeline);
-		//nn_set_function_neuron(nn , upd_neuron_perceptron);
-		nn_set_function_weight(nn , upd_weights_adeline);
-		//nn_set_function_weight(nn , upd_weights_perceptron);
-		fflush(stdout);
-		nnc = nnc_new();
-		nnc_set_data(nnc, data);
-		nnc_set_neural_network(nnc , nn);
-		nnc_set_training_parameters(nnc , 0 , 1,1);
-		nnc_train_network(nnc);
-		nnc_classifier(nnc);
-		nnc_free(nnc);
-        return 0;
-    case MODE_PRESET:
+    /* PRESET MODE */
+    if (mode == MODE_PRESET) {
         switch (preset) {
         case PRESET_MCCULLOCH:
-            nn = nn_read_from_file(P_MCCULLOCH_NEURAL);
+            if (neural_file) {
+                nn = nn_read_from_file(neural_file);
+            } else {
+                nn = nn_read_from_file(P_MCCULLOCH_NEURAL);
+            }
             if (!nn) {
                 printf("[ ERROR] Error reading neural network file.\n");
                 return -1;
@@ -130,8 +108,43 @@ int main(int argc, char *argv[]){
             break;
         }
         return 0;
+    } else {
+        /* STANDARD MODE */
+        /* Read data */
+        data = data_from_file(input_file, 1);
+        if (!data) {
+            printf("[ ERROR] Error reading input file.\n");
+            return -1;
+        }
+        n_attrs = sample_get_n_attrs(*(data_get_samples(*data)[0]));
+        n_clases = data_get_n_classes(*data);
+        /* Create network */
+        nn = nn_read_from_file(neural_file);
+        if (!nn) {
+            printf("[ ERROR] Error reading neural network file.\n");
+            return -1;
+        }
+        /* Assign mode */
+        switch (mode) {
+        case MODE_PERCEPTRON:
+            nn_set_function_neuron(nn , upd_neuron_perceptron);
+            nn_set_function_weight(nn , upd_weights_perceptron);
+            break;
+        case MODE_ADELINE:
+            nn_set_function_neuron(nn , upd_neuron_adeline);
+            nn_set_function_weight(nn , upd_weights_adeline);
+            break;
+        }
+        fflush(stdout);
+        /* Create Classifier */
+        nnc = nnc_new();
+        nnc_set_data(nnc, data);
+        nnc_set_neural_network(nnc , nn);
+        nnc_set_training_parameters(nnc , 0 , 1,1);
+        nnc_train_network(nnc);
+        nnc_classifier(nnc);
+        nnc_free(nnc);
     }
-    
     
     return 0;
 }
@@ -163,12 +176,10 @@ int process_opts(int argc, char *const *argv) {
         switch (c) {
         case 'm':
             printf("[ INFO ] Mode: %s\n", optarg);
-            if (!strcmp(optarg, "simulate")) {
-                mode = MODE_SIMULATE;
-            } else if (!strcmp(optarg, "classify")) {
-                mode = MODE_CLASSIFY;
-            } else if (!strcmp(optarg, "preset")) {
-                mode = MODE_PRESET;
+            if (!strcmp(optarg, "perceptron")) {
+                mode = MODE_PERCEPTRON;
+            } else if (!strcmp(optarg, "adeline")) {
+                mode = MODE_ADELINE;
             } else {
                 printf("[ ERROR] Unrecogniced mode: %s\n", optarg);
                 return -1;
@@ -189,7 +200,7 @@ int process_opts(int argc, char *const *argv) {
         case 'p':
             printf("[ INFO ] Preset: %s\n", optarg);
             mode = MODE_PRESET;
-            if (!strcmp(optarg, "mcculloch")) {
+            if (!strcmp(optarg, "macculloch")) {
                 preset = PRESET_MCCULLOCH;
             } else {
                 printf("[ ERROR] Unrecogniced preset: %s\n", optarg);
@@ -212,7 +223,8 @@ int process_opts(int argc, char *const *argv) {
 
 void print_help() {
     printf("[ INFO ] Ussage:\n");
-    printf("             neural-network -m MODE -n NETWORK -i INPUT -o OUTPUT\n");
+    printf("             neural-network -m MODE    -n NETWORK -i INPUT -o OUTPUT\n");
+    printf("             neural-network -p PRESET [-n NETWORK -i INPUT -o OUTPUT]\n");
     printf("         Options:\n");
     printf("             -m, --mode:           Execution mode [classify, simulate or preset].\n");
     printf("             -n, --neural-network: File with network description.\n");
