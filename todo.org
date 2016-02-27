@@ -14,7 +14,16 @@
    - output-file: archivo donde escribir la salida de la clasificación.
 
 * Clasificador
-** TODO Inicializar
+** TODO Estadisticas Detalladas
+   Guardar estadísticas de train y de test, para imprimirlas despues.
+** TODO Prezi Print
+   Implementar nnc_print_info():
+     - Numero de iteraciones en test.
+     - Porcentaje de acierto en train y en test.
+** TODO Condiciones de parada
+   Implementar funcion check_parada().
+   Implementar calculo de MSE y accuracy.
+** DONE Inicializar
    Crear conexiones entre neuronas en base al tipo de red
 ** DONE Consideraciones de Diseño
 *** Data Sets
@@ -67,5 +76,5 @@
     - nnc_set_stopping_conditions
     - nnc_train_network
 
-** IN-PROGRESS Crear Clasificadores
+** DONE Crear Clasificadores
    Crear los clasificadores necesarios en la práctica.

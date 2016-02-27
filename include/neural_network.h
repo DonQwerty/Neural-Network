@@ -29,7 +29,7 @@ typedef struct Neural_Layer_ {
 typedef struct Neural_Network_ {
     int n_neurons;                 /* Total number of neurons in the net */
     nn_upd_neuron upd_neuron;      /* Function to compute the new value of a neuron */
-    nn_upd_weight upd_weight;   /* Function to compute the new weight of a connection */
+    nn_upd_weight upd_weight;      /* Function to compute the new weight of a connection */
     int n_layers;                  /* Number of layers in the network (including in/out) */
     Neural_Layer * layers;         /* Layers array */
 } Neural_Network;
@@ -91,7 +91,6 @@ void nn_update_weights(Neural_Network * nn, double alpha, double * t);
 /* Private Methods */
 /* Neural Network Methods */
 /* Access the network array of neurons */
-/* TODO: Not sure this works */
 #define nn_array(nn) (nn)->layers[0].neurons
 
 /* Sets the connections to a neuron from the others */

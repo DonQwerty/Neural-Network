@@ -44,7 +44,6 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
     nn->n_layers = n_layers;
     offset = 0;
     for (i = 0; i < n_layers; i++) {
-        /* TODO: Check pointers */
         layer_init(&(nn->layers[i]), n_neurons_layer[i], neurons_arr + offset);
         offset += n_neurons_layer[i];
     }
@@ -72,8 +71,8 @@ Neural_Network * nn_read_from_file(const char * file) {
             return NULL;
         }
     }
-    printf("[ INFO ] Creating network with %d layers\n", n_layers);
-    printf("[ INFO ]     Neurons per layer: ");
+    // printf("[ INFO ] Creating network with %d layers\n", n_layers);
+    // printf("[ INFO ]     Neurons per layer: ");
     /* Neurons per layer */
     n_neurons_layer = (int * ) malloc(n_layers * sizeof(int));
     for (i = 0; i < n_layers; i++) {
@@ -85,9 +84,9 @@ Neural_Network * nn_read_from_file(const char * file) {
                 return NULL;
             }
         }
-        printf("%d ", n_neurons_layer[i]);
+        // printf("%d ", n_neurons_layer[i]);
     }
-    printf("\n");
+    // printf("\n");
     fscanf(f, "\n");
     /* Total number of neurons */
     n_neurons = 0;
@@ -95,7 +94,7 @@ Neural_Network * nn_read_from_file(const char * file) {
         n_neurons += n_neurons_layer[i];
     }
     /* thresholds */
-    printf("[ INFO ]     Thresholds: ");
+    // printf("[ INFO ]     Thresholds: ");
     thresholds = (double * ) malloc(n_neurons * sizeof(double));
     for (i = 0; i < n_neurons; i++) {
         count = fscanf(f, "%lf", thresholds + i);
@@ -106,9 +105,9 @@ Neural_Network * nn_read_from_file(const char * file) {
                 return NULL;
             }
         }
-        printf("%lf ", thresholds[i]);
+        // printf("%lf ", thresholds[i]);
     }
-    printf("\n");
+    // printf("\n");
 
 
 
@@ -188,7 +187,7 @@ void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int d
 
 void nn_update_weights(Neural_Network * nn, double alpha, double * t){
     int i,j=0;
-    for (i = nn->n_neurons -1; i >= nn->n_neurons -1; i--) { //TODO cambiar estooo
+    for (i = nn->n_neurons -1; i >= nn->n_neurons -1; i--) {
         (*nn->upd_weight)(&nn_array(nn)[i], alpha , t[j]);
         j++;
     }

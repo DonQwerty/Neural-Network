@@ -139,8 +139,8 @@ int main(int argc, char *argv[]){
         /* Create Classifier */
         nnc = nnc_new();
         nnc_set_data(nnc, data);
-        nnc_set_neural_network(nnc , nn);
-        nnc_set_training_parameters(nnc , 0 , 1,1);
+        nnc_set_neural_network(nnc, nn);
+        nnc_set_training_parameters(nnc, 0, 1, 1);
         nnc_train_network(nnc);
         nnc_classifier(nnc);
         nnc_free(nnc);
@@ -178,7 +178,7 @@ int process_opts(int argc, char *const *argv) {
             printf("[ INFO ] Mode: %s\n", optarg);
             if (!strcmp(optarg, "perceptron")) {
                 mode = MODE_PERCEPTRON;
-            } else if (!strcmp(optarg, "adeline")) {
+            } else if (!strcmp(optarg, "adaline")) {
                 mode = MODE_ADELINE;
             } else {
                 printf("[ ERROR] Unrecogniced mode: %s\n", optarg);
@@ -226,9 +226,9 @@ void print_help() {
     printf("             neural-network -m MODE    -n NETWORK -i INPUT -o OUTPUT\n");
     printf("             neural-network -p PRESET [-n NETWORK -i INPUT -o OUTPUT]\n");
     printf("         Options:\n");
-    printf("             -m, --mode:           Execution mode [classify, simulate or preset].\n");
+    printf("             -m, --mode:           Neuron mode [perceptron, adaline].\n");
     printf("             -n, --neural-network: File with network description.\n");
     printf("             -i, --input-file:     File with the inputs (or data) as rows.\n");
     printf("             -o, --ouput-file:     File to write the output of the network.\n");
-    printf("             -p, --preset:         Load a predefined network.\n");
+    printf("             -p, --preset:         Load a predefined network [macculloch].\n");
 }

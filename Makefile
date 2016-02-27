@@ -47,7 +47,7 @@ $(BDIR)/$(TARGET): $(OBJECTS)
 	@echo "INFO: Linking completed"
 
 $(OBJECTS):$(ODIR)/%.o: $(SDIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "INFO: Compiled "$<" successfully"
 
 # P1.2 MacCulloch-Pitts Network
@@ -67,11 +67,11 @@ else
 endif
 
 # P1.3.2 Adelaide
-p1.3.2-adelaide:
+p1.3.2-adaline:
 ifeq ($(INPUT_FILE),no_input)
 	@echo "ERROR: INPUT_FILE was not set."
 else
-	./$(TARGET) --mode adelaide --neural-network $(ADELAIDE_FILE) --input-file $(INPUT_FILE)
+	./$(TARGET) --mode adaline --neural-network $(ADELAIDE_FILE) --input-file $(INPUT_FILE)
 endif
 
 # Flycheck (emacs) requirement
@@ -81,7 +81,7 @@ check-syntax:
 
 # Displays the help for this makefile
 help:
-	@echo "             Neural Network Makefile"
+	@echo "              Neural Network Makefile"
 	@echo "Targets:"
 	@echo "   - compile"
 	@echo "         Compiles all sources and generates the executable."
@@ -89,8 +89,8 @@ help:
 	@echo "         Executes the macculloch-pitts network."
 	@echo "   - p1.3.1-perceptron"
 	@echo "         Executes the perceptron classifier."
-	@echo "   - p1.3.2-adelaide"
-	@echo "         Executes the adelaide classifier."
+	@echo "   - p1.3.2-adaline"
+	@echo "         Executes the adaline classifier."
 	@echo "   - clean"
 	@echo "         Removes all objects."
 	@echo "Arguments:"

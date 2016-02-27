@@ -81,8 +81,8 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 
 int nnc_train_network(Classifier * c){
 	
-    while(c->epoch < 5000){
-		printf("---Epoca %d--\n" , c->epoch);
+    while(c->epoch < c->max_epochs){
+		// printf("---Epoca %d--\n" , c->epoch);
 		fflush(stdout);
         nnc_run_training_epoch(c);
         nnc_run_statistics(c);
@@ -135,8 +135,13 @@ double nnc_classifier(Classifier * c){
     return ((double) sum * 100)/data_get_n_samples(*(c->data_validation));
 }
 
-/* Private Methods */
+void nnc_print_info(Classifier * c) {
+    /* TODO Implement */
+    return;
+}
 
+
+/* Private Methods */
 void nnc_run_training_epoch(Classifier * c){
 	int i , j;
     double * values;
