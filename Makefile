@@ -6,6 +6,13 @@
     # 	       Daniel Gimenez Llorente	  #
     #######################################
 
+# ARGUMENTS
+INPUT_FILE ?= no_input
+
+#NEURAL FILES
+PERCEPTRON_FILE = data/models/prueba1.txt
+ADELAIDE_FILE    = data/models/prueba2.txt
+
 # DIRECTORIES
 IDIR		= include
 SDIR		= src
@@ -45,15 +52,27 @@ $(OBJECTS):$(ODIR)/%.o: $(SDIR)/%.c
 
 # P1.2 MacCulloch-Pitts Network
 p1.2-macculloch-pits:
+ifeq ($(INPUT_FILE),no_input)
 	./$(TARGET) --preset macculloch
+else
+	./$(TARGET) --preset macculloch --input-file $(INPUT_FILE)
+endif
 
 # P1.3.1 Perceptron
 p1.3.1-perceptron:
-	@echo "TODO: p1.3.1-perceptron"
+ifeq ($(INPUT_FILE),no_input)
+	@echo "ERROR: INPUT_FILE was not set."
+else
+	./$(TARGET) --mode perceptron --neural-network $(PERCEPTRON_FILE) --input-file $(INPUT_FILE)
+endif
 
 # P1.3.2 Adelaide
 p1.3.2-adelaide:
-	@echo "TODO: p1.3.2-adelaide"
+ifeq ($(INPUT_FILE),no_input)
+	@echo "ERROR: INPUT_FILE was not set."
+else
+	./$(TARGET) --mode adelaide --neural-network $(ADELAIDE_FILE) --input-file $(INPUT_FILE)
+endif
 
 # Flycheck (emacs) requirement
 .PHONEY: check-syntax
@@ -62,7 +81,21 @@ check-syntax:
 
 # Displays the help for this makefile
 help:
-	@echo "TODO: help"
+	@echo "             Neural Network Makefile"
+	@echo "Targets:"
+	@echo "   - compile"
+	@echo "         Compiles all sources and generates the executable."
+	@echo "   - p1.2-macculloch-pitts"
+	@echo "         Executes the macculloch-pitts network."
+	@echo "   - p1.3.1-perceptron"
+	@echo "         Executes the perceptron classifier."
+	@echo "   - p1.3.2-adelaide"
+	@echo "         Executes the adelaide classifier."
+	@echo "   - clean"
+	@echo "         Removes all objects."
+	@echo "Arguments:"
+	@echo "   - INPUT_FILE"
+	@echo "         File to read from. Must be set for p1.3.1 and p1.3.2"
 
 .PHONEY: clean
 clean:

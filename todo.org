@@ -1,9 +1,9 @@
-* FIXMEs
-** MAIN
-*** TODO STRDUPS
-    Cambiar strdup for strncpy
-
+* Makefile
+** TODO Argumentos
+   Introducir argumento INPUT_FILE, que si se define lo pasa al programa como arg.
 * Programa Principal
+** TODO Liberar memoria
+*** TODO Cambiar strdup por strncpy
 ** DONE Argumentos
    - mode
      + preset:    ejecuta con opciones preestablecidas (ej1, ...).
