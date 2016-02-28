@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "neural_network.h"
 
 
@@ -49,6 +50,104 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
     }
     
     return nn;
+}
+
+Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar , int sesg) {
+    Neural_Network * nn;
+    int  n_neurons;
+    int * n_neurons_layer;
+    double * thresholds;
+    double * cons;
+    int i, j;
+    double r;
+   srand(time(NULL));
+   //TODO V 2.0 Create different layers
+    n_neurons_layer = (int * ) malloc(n_layers * sizeof(int));
+   // for (i = 0; i < n_layers; i++) {
+      //  n_neurons_layer[i];
+        // printf("%d ", n_neurons_layer[i]);
+   // }
+    n_neurons_layer[0] = n_attrs+sesg;
+    n_neurons_layer[1] = (bipolar ==  1) ? 1 : n_clas;
+    
+   
+    n_neurons = 0;
+    for (i = 0; i < n_layers; i++) {
+        n_neurons += n_neurons_layer[i];
+    }
+    /* thresholds */
+    // printf("[ INFO ]     Thresholds: ");
+    thresholds = (double * ) malloc(n_neurons * sizeof(double));
+    for (i = 0; i < n_neurons; i++) {
+        thresholds[i] = 0;
+    }
+    // printf("\n");
+    /* CREATE NETWORK */
+    nn = nn_new(n_layers, n_neurons_layer,thresholds);
+    free(n_neurons_layer);
+    /* Add neurons connections */
+    cons = (double * ) malloc(n_neurons * sizeof(double));
+    for (i = 0; i < n_neurons; i++) {
+        /* Read connections for neuron i */
+        for (j = 0; j < n_neurons; j++) {
+            if(i >= n_attrs+sesg && j<i){
+                r = ((double)rand())/RAND_MAX-0.5;
+                while(r==0){
+                    r = ((double)rand())/RAND_MAX-0.5;
+                }
+                cons[j] = r;
+            }
+            else{
+                cons[j] = 0;
+            }
+        }
+        nn_connect_neuron(nn, i, cons);
+    }
+    free(cons);
+    return nn;
+}
+
+int nn_save_to_file(Neural_Network * nn, const char * file) {
+   FILE * f;
+   Neuron * cur_neuron;
+   int n_neurons, n_cur_neuron, n_cur_con;
+   int i, j;
+   
+   f = fopen(file, "w");
+   if (!f) return -1;
+
+   n_neurons = nn->n_neurons;
+   for (n_cur_neuron = 0; n_cur_neuron < n_neurons; n_cur_neuron++) {
+       cur_neuron = &(nn_array(nn)[n_cur_neuron]);
+
+       if (cur_neuron->n_cons == n_neurons) {
+           /* This neuron has all connections. Write directly */
+           for (i = 0; i < n_neurons; i++) {
+               fprintf(f, "%lf ", cur_neuron->cons[i].weight);
+
+           }
+       } else {
+           /* This neuron does not have all connections */
+           
+               for (i = 0; i < n_neurons; i++) {
+                    for (j = 0 ; j < cur_neuron->n_cons ; j++){
+                        if (&(nn_array(nn)[i]) == cur_neuron->cons[j].from) {
+                            fprintf(f, "%lf ", cur_neuron->cons[j].weight);
+                            break;
+                        } 
+                   }
+                   if(j == cur_neuron->n_cons)
+                       fprintf(f, "0.0 ");
+                  
+               }
+           
+       }
+           
+       fprintf(f, "\n");
+   }
+   fclose(f);
+
+   return 0;
 }
 
 Neural_Network * nn_read_from_file(const char * file) {

@@ -119,28 +119,35 @@ int main(int argc, char *argv[]){
         n_attrs = sample_get_n_attrs(*(data_get_samples(*data)[0]));
         n_clases = data_get_n_classes(*data);
         /* Create network */
-        nn = nn_read_from_file(neural_file);
+        //nn = nn_read_from_file(neural_file);
+        nn = nn_init(n_attrs, n_clases,2, 1 ,1);
+        nn_save_to_file(nn, "salidita.txt");//TODO pasar por argumento
         if (!nn) {
             printf("[ ERROR] Error reading neural network file.\n");
             return -1;
         }
+        
+        /* Create Classifier */
+        nnc = nnc_new();
+        nnc_set_data(nnc, data);
+        nnc_set_neural_network(nnc, nn);
+
         /* Assign mode */
         switch (mode) {
         case MODE_PERCEPTRON:
             nn_set_function_neuron(nn , upd_neuron_perceptron);
             nn_set_function_weight(nn , upd_weights_perceptron);
+            nnc_set_training_parameters(nnc, 0, 1, 0);
             break;
         case MODE_ADELINE:
             nn_set_function_neuron(nn , upd_neuron_adeline);
             nn_set_function_weight(nn , upd_weights_adeline);
+            nnc_set_training_parameters(nnc, 0, 1, 1);
             break;
         }
         fflush(stdout);
-        /* Create Classifier */
-        nnc = nnc_new();
-        nnc_set_data(nnc, data);
-        nnc_set_neural_network(nnc, nn);
-        nnc_set_training_parameters(nnc, 0, 1, 1);
+        
+        
         nnc_train_network(nnc);
         nnc_classifier(nnc);
         nnc_print_info(nnc);

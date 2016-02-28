@@ -27,6 +27,9 @@
    Crear conexiones entre neuronas en base al tipo de red
 ** DONE Consideraciones de Diseño
 *** Data Sets
+**** TODO Añadir argumentos
+      Añadir division 1:1
+      fichero de clasificacion
     - Usual data division:
       + Training Set:       ~ 60%
       + Generalization Set: ~ 20%

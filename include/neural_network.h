@@ -60,11 +60,13 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
 */
 Neural_Network * nn_read_from_file(const char * file);
 
+Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar, int sesg);
+
 /* Reads a neural network from stdin, asking for each layer's weights */
 int nn_read_from_stdin(Neural_Network * nn);
 
 /* Saves the network to a file, in the format specified previously */
-int nn_save_to_file(Neural_Network * nn, char * file);
+int nn_save_to_file(Neural_Network * nn, const char * file) ;
 
 /* Destroy the network structure and free memory */
 void nn_free(Neural_Network * nn);
