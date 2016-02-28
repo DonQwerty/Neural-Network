@@ -27,7 +27,7 @@ int preset          = -1;
 int max_epochs      = -1;
 char * neural_file  = NULL;
 char * input_file   = NULL;
-char * output_file  = NULL;
+char * output_file  = "/dev/null";
 int predict_flag = 0;
 int save_flag = 0;
 int percen = -1;
@@ -267,9 +267,9 @@ void print_help() {
     printf("             -i, --input-file:     File with the inputs (or data) as rows.\n");
     printf("             -o, --ouput-file:     File to write the output of the network.\n");
     printf("             -e, --max-epochs:     Maximum number of epochs to train.\n");
-    printf("             -f, --predict:   File to write the predictions [Activates predict mode].\n");
+    printf("             -f, --predict:        Activates the predict mode.\n");
     printf("             -p, --preset:         Load a predefined network [macculloch].\n");
-    printf("             -s, --save:        Writes the resulting network to NETWORK file.\n");
-    printf("             -t, --percent:         Percen of train.\n");
+    printf("             -s, --save:           Writes the resulting network to NETWORK file.\n");
+    printf("             -t, --percent:        Percen of train.\n");
 
 }
