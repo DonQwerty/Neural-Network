@@ -22,11 +22,15 @@ static const char P_MCCULLOCH_OUTPUT[]      = "out/McCulloch-Pitts.txt";
 
 
 /* Global variables for options processing */
-int mode = -1;
-int preset = -1;
-char * neural_file = NULL;
-char * input_file  = NULL;
-char * output_file = NULL;
+int mode            = -1;
+int preset          = -1;
+int max_epochs      = -1;
+char * neural_file  = NULL;
+char * input_file   = NULL;
+char * output_file  = NULL;
+int predict_flag = 0;
+int save_flag = 0;
+int percen = -1;
 
 /* Stores the values for the options in the propper global variables */
 int process_opts(int argc, char *const *argv);
@@ -41,7 +45,7 @@ int main(int argc, char *argv[]){
     Data * data;
     FILE * f_in;
     FILE * f_out;
-	Classifier * nnc;
+    Classifier * nnc;
     double * values;
     char text[20];
     char * ptr;
@@ -111,6 +115,7 @@ int main(int argc, char *argv[]){
     } else {
         /* STANDARD MODE */
         /* Read data */
+
         data = data_from_file(input_file, 1);
         if (!data) {
             printf("[ ERROR] Error reading input file.\n");
@@ -119,17 +124,19 @@ int main(int argc, char *argv[]){
         n_attrs = sample_get_n_attrs(*(data_get_samples(*data)[0]));
         n_clases = data_get_n_classes(*data);
         /* Create network */
-        //nn = nn_read_from_file(neural_file);
-        nn = nn_init(n_attrs, n_clases,2, 1 ,1);
-        nn_save_to_file(nn, "salidita.txt");//TODO pasar por argumento
+        if (neural_file && save_flag==0) {
+            nn = nn_read_from_file(neural_file);
+        } else {
+            nn = nn_init(n_attrs, n_clases,2, 1 ,1);
+        }
         if (!nn) {
             printf("[ ERROR] Error reading neural network file.\n");
             return -1;
         }
         
         /* Create Classifier */
-        nnc = nnc_new();
-        nnc_set_data(nnc, data);
+        nnc = nnc_new(output_file);
+        nnc_set_data(nnc, data, predict_flag, percen);
         nnc_set_neural_network(nnc, nn);
 
         /* Assign mode */
@@ -146,11 +153,16 @@ int main(int argc, char *argv[]){
             break;
         }
         fflush(stdout);
-        
-        
-        nnc_train_network(nnc);
-        nnc_classifier(nnc);
-        nnc_print_info(nnc);
+        if(max_epochs!=-1){
+            nnc_set_stopping_conditions(nnc,max_epochs,0,0);
+        }
+        if (!predict_flag)
+            /* No predictions file. Train network */
+            nnc_train_network(nnc);
+        if (save_flag)
+            nn_save_to_file(nn, neural_file);
+        nnc_classifier(nnc, predict_flag);
+        if(!predict_flag) nnc_print_info(nnc);
         nnc_free(nnc);
     }
     
@@ -170,14 +182,17 @@ int process_opts(int argc, char *const *argv) {
                 {"input-file",      required_argument,  0, 'i'},
                 {"output-file",     required_argument,  0, 'o'},
                 {"preset",          required_argument,  0, 'p'},
+                {"predict",    no_argument,  0, 'f'},
+                {"train-percent",    required_argument,  0, 't'},
+                {"save-file",    no_argument,  0, 's'},
                 {0, 0, 0, 0}
             };
 
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "m:n:i:o:p:", long_options, &option_index);
+        c = getopt_long (argc, argv, "m:n:i:o:p:ft:s", long_options, &option_index);
 
-/* Detect the end of the options. */
+        /* Detect the end of the options. */
         if (c == -1)
             break;
 
@@ -205,6 +220,19 @@ int process_opts(int argc, char *const *argv) {
             printf("[ INFO ] Output file: %s\n", optarg);
             output_file = strdup(optarg);
             break;
+        case 'f':
+            printf("[ INFO ] Prediction mode: predictions written to output_file\n");
+            predict_flag = 1;
+            break;
+        case 'e':
+            max_epochs = atoi(optarg);
+            break;
+        case 't':
+            percen = atoi(optarg);
+            break;
+        case 's':
+            save_flag = 1;
+            break;
         case 'p':
             printf("[ INFO ] Preset: %s\n", optarg);
             mode = MODE_PRESET;
@@ -230,13 +258,18 @@ int process_opts(int argc, char *const *argv) {
 }
 
 void print_help() {
-    printf("[ INFO ] Ussage:\n");
-    printf("             neural-network -m MODE    -n NETWORK -i INPUT -o OUTPUT\n");
+    printf("[ INFO ] Usage:\n");
+    printf("             neural-network -m MODE -i INPUT -o OUTPUT    [-n NETWORK -s -t PERCEN -e EPOCHS -f]\n");
     printf("             neural-network -p PRESET [-n NETWORK -i INPUT -o OUTPUT]\n");
     printf("         Options:\n");
     printf("             -m, --mode:           Neuron mode [perceptron, adaline].\n");
     printf("             -n, --neural-network: File with network description.\n");
     printf("             -i, --input-file:     File with the inputs (or data) as rows.\n");
     printf("             -o, --ouput-file:     File to write the output of the network.\n");
+    printf("             -e, --max-epochs:     Maximum number of epochs to train.\n");
+    printf("             -f, --predict:   File to write the predictions [Activates predict mode].\n");
     printf("             -p, --preset:         Load a predefined network [macculloch].\n");
+    printf("             -s, --save:        Writes the resulting network to NETWORK file.\n");
+    printf("             -t, --percent:         Percen of train.\n");
+
 }

@@ -5,7 +5,7 @@
 #include "classifier.h"
 
 /* Public Methods */
-Classifier * nnc_new() {
+Classifier * nnc_new(char * output) {
     Classifier * c;
     c = (Classifier *) malloc(sizeof(Classifier));
     if (!c) return NULL;
@@ -25,6 +25,7 @@ Classifier * nnc_new() {
     c->max_accuracy = DEF_MAX_ACCURACY;
     c->max_mse = DEF_MAX_MSE;
 
+    c->predictions = fopen(output, "w");
     /* Statistics Inicialization */
     c->file_statistics = fopen("out/stats.csv","w");
     c->accuracy_training = 0.0;
@@ -51,9 +52,16 @@ int nnc_set_neural_network(Classifier * c, Neural_Network * nn){
     return 0;
 }
 
-int nnc_set_data(Classifier * c, Data * d) {
+int nnc_set_data(Classifier * c, Data * d, int flag, int percen) {
     if (!c || !d) return -1;
-    train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, DEF_TRAINIG_PERCENT);
+    if(flag){
+        c->data_training = d;
+        c->data_validation = d;
+        return 0;
+    }
+    if(percen == -1)
+        percen = DEF_TRAINIG_PERCENT;
+    train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, percen);
     
     return 0;
 }
@@ -62,6 +70,7 @@ int nnc_free(Classifier * c){
 	if(!c)
 		return -1;
 	fclose(c->file_statistics );
+    fclose(c->predictions);
 	nn_free(c->nn);
 	data_free(c->data_training);
 	free(c);
@@ -96,11 +105,12 @@ int nnc_train_network(Classifier * c){
     return 0;
 }
 
-double nnc_classifier(Classifier * c){
+double nnc_classifier(Classifier * c, int predict_flag){
     int i,j, pos;
     double aux;
 	double * output;
 	int sum = 0;
+    double res;
 	int n_clases = data_get_n_classes(*c->data_validation);
     for ( i = 0; i < data_get_n_samples(*(c->data_validation)); i++){
         Sample * s = data_get_samples(*(c->data_validation))[i];
@@ -109,14 +119,20 @@ double nnc_classifier(Classifier * c){
 		output = nn_get_output(*c->nn);
 		//printf("%lf %lf %lf %lf %lf\n", s->values[0],s->values[1],s->values[2],s->values[3],output[0]);
 		if(n_clases == 2 && c->bipolar==1){
+            res = output[0] ;
             if(c->function_transfer){
-        		if((output[0] >= 0 && sample_get_class(*s)==1) || (output[0] < 0 && sample_get_class(*s)==-1) )
+                res = (res < 0) ? -1 : 1;
+        		if((res >= 0 && sample_get_class(*s)==1) || (res < 0 && sample_get_class(*s)==-1) )
                 	sum++;
         	}
         	else{
         		if(output[0] == sample_get_class(*s))
                 	sum++;
         	}
+            if(!predict_flag)
+                fprintf(c->predictions, "%d\t%d\n",sample_get_class(*s), (int)res);
+            else
+                fprintf(c->predictions, "%d\n", (int)res);
         }
         else{
             if(c->function_transfer){
@@ -140,6 +156,8 @@ double nnc_classifier(Classifier * c){
     // printf("El porcentaje de acierto es de %lf \n", ((double) sum * 100)/data_get_n_samples(*(c->data_validation)));
     return ((double) sum * 100)/data_get_n_samples(*(c->data_validation));
 }
+
+
 
 void nnc_print_info(Classifier * c) {
     printf("[ INFO ] Number of iterations: %d\n", c->epoch);

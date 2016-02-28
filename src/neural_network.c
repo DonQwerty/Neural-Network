@@ -110,13 +110,22 @@ Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar , in
 int nn_save_to_file(Neural_Network * nn, const char * file) {
    FILE * f;
    Neuron * cur_neuron;
-   int n_neurons, n_cur_neuron, n_cur_con;
+   int n_neurons, n_cur_neuron;
    int i, j;
    
    f = fopen(file, "w");
    if (!f) return -1;
 
+   fprintf(f, "%d\n", nn->n_layers);
+   for(i = 0 ; i < nn->n_layers ; i++){
+        fprintf(f, "%d ", nn->layers[i].n_neurons);
+   }
    n_neurons = nn->n_neurons;
+   fprintf(f, "\n%lf", nn_array(nn)[0].threshold);
+   for(i = 1; i < n_neurons ; i++){
+        fprintf(f, " %lf", nn_array(nn)[i].threshold);
+   }
+   fprintf(f, "\n");
    for (n_cur_neuron = 0; n_cur_neuron < n_neurons; n_cur_neuron++) {
        cur_neuron = &(nn_array(nn)[n_cur_neuron]);
 

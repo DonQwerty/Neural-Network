@@ -10,7 +10,7 @@
 #define DEF_GENERALIZATION_PERCENT 20.0
 #define DEF_VALIDATION_PERCENT     20.0
 #define DEF_LEARNING_RATE          0.02
-#define DEF_MAX_EPOCHS             5000
+#define DEF_MAX_EPOCHS             1500
 #define DEF_MAX_ACCURACY           95
 #define DEF_MAX_MSE                0.001
 
@@ -33,6 +33,9 @@ typedef struct Classifier_ {
     
     /* Epoch Statistics */
     FILE * file_statistics;
+
+    /*Output file*/
+    FILE * predictions;
     /* Accuracy */
     double accuracy_training;
     double accuracy_generalization;
@@ -47,13 +50,13 @@ typedef struct Classifier_ {
 
 /* Public Methods */
 /* Allocates memory for the classifier with default parameters */
-Classifier * nnc_new();
+Classifier * nnc_new(char * output);
 
 /* Changes the parameters. If NULL, the default value is used */
 int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar, int function_transfer);
 
 /* Receives the data and divides it into training, generalization and validation */
-int nnc_set_data(Classifier * c, Data * d);
+int nnc_set_data(Classifier * c, Data * d, int flag, int percen);
 
 /* Sets the stopping conditions. If NULL, the condition is not used */
 int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accuracy, double max_mse);
@@ -62,7 +65,7 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 int nnc_train_network(Classifier * c);
 
 /*Classifies the data validation and return the success rate*/
-double nnc_classifier(Classifier * c);
+double nnc_classifier(Classifier * c,int real_class);
 
 /* Prezi Print */
 void nnc_print_info(Classifier * c);

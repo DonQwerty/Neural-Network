@@ -20,13 +20,25 @@ void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen
         data->samples[i]= data->samples[r+i];
        data->samples[r+i] =  aux;
 	}
-	index = (porcen* n)/100;
-	n_samples_set(*train,index);
-	n_samples_set(*test, n - index);
-	n_classes_set(*train,data->n_classes);
-	n_classes_set(*test,data->n_classes);
-	(*train)->samples = data->samples;
-	(*test)->samples = data->samples + index;
+  if (porcen==100){
+    n_samples_set(*train,n);
+    n_samples_set(*test, n );
+    n_classes_set(*train,data->n_classes);
+    n_classes_set(*test,data->n_classes);
+   (*train)->samples = data->samples;
+   (*test)->samples = data->samples;
+
+  }
+  else{
+      index = (porcen* n)/100;
+    n_samples_set(*train,index);
+    n_samples_set(*test, n - index);
+    n_classes_set(*train,data->n_classes);
+    n_classes_set(*test,data->n_classes);
+    (*train)->samples = data->samples;
+    (*test)->samples = data->samples + index;
+
+  }
 	free(data);
 }
 
