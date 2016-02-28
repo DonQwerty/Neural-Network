@@ -143,6 +143,7 @@ int main(int argc, char *argv[]){
         nnc_set_training_parameters(nnc, 0, 1, 1);
         nnc_train_network(nnc);
         nnc_classifier(nnc);
+        nnc_print_info(nnc);
         nnc_free(nnc);
     }
     

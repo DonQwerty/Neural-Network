@@ -77,7 +77,7 @@ int nnc_set_neural_network(Classifier * c, Neural_Network * nn);
 /* Private Methods */
 void nnc_run_training_epoch(Classifier * c);
 
-void nnc_run_statistics(Classifier * c);
+double nnc_run_statistics(Classifier * c);
 
 
 

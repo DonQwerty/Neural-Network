@@ -80,14 +80,19 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 }
 
 int nnc_train_network(Classifier * c){
-	
+
+    double accuracy;
+    
     while(c->epoch < c->max_epochs){
 		// printf("---Epoca %d--\n" , c->epoch);
 		fflush(stdout);
         nnc_run_training_epoch(c);
-        nnc_run_statistics(c);
+        accuracy = nnc_run_statistics(c);
 		c->epoch++;
     }
+
+    c->accuracy_training = accuracy;
+    
     return 0;
 }
 
@@ -131,12 +136,16 @@ double nnc_classifier(Classifier * c){
         	}
         }
     }
-    printf("El porcentaje de acierto es de %lf \n", ((double) sum * 100)/data_get_n_samples(*(c->data_validation)));
+    c->accuracy_validation = ((double) sum * 100)/data_get_n_samples(*(c->data_validation));
+    // printf("El porcentaje de acierto es de %lf \n", ((double) sum * 100)/data_get_n_samples(*(c->data_validation)));
     return ((double) sum * 100)/data_get_n_samples(*(c->data_validation));
 }
 
 void nnc_print_info(Classifier * c) {
-    /* TODO Implement */
+    printf("[ INFO ] Number of iterations: %d\n", c->epoch);
+    printf("[ INFO ] Accuracy (%% of success):\n");
+    printf("           Train: %lf\n", c->accuracy_training);
+    printf("           Test:  %lf\n", c->accuracy_validation);
     return;
 }
 
@@ -174,7 +183,7 @@ void nnc_run_training_epoch(Classifier * c){
 	free(values);
 }
 
-void nnc_run_statistics(Classifier * c){
+double nnc_run_statistics(Classifier * c){
     int i ,j, pos;
     double aux;
     int sum = 0; 
@@ -222,5 +231,6 @@ void nnc_run_statistics(Classifier * c){
         
     }
     fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));
+    return ((double) sum*100 )/ data_get_n_samples(*(c->data_training));
 }
 
