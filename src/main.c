@@ -28,9 +28,9 @@ int max_epochs      = -1;
 char * neural_file  = NULL;
 char * input_file   = NULL;
 char * output_file  = "/dev/null";
-int predict_flag = 0;
-int save_flag = 0;
-int percen = -1;
+int predict_flag    = 0;
+int save_flag       = 0;
+int percen          = -1;
 
 /* Stores the values for the options in the propper global variables */
 int process_opts(int argc, char *const *argv);
@@ -182,15 +182,16 @@ int process_opts(int argc, char *const *argv) {
                 {"input-file",      required_argument,  0, 'i'},
                 {"output-file",     required_argument,  0, 'o'},
                 {"preset",          required_argument,  0, 'p'},
-                {"predict",    no_argument,  0, 'f'},
-                {"train-percent",    required_argument,  0, 't'},
-                {"save-file",    no_argument,  0, 's'},
+                {"predict",         no_argument,        0, 'f'},
+                {"train-percent",   required_argument,  0, 't'},
+                {"save-file",       no_argument,        0, 's'},
+                {"help",            no_argument,        0, 'h'},
                 {0, 0, 0, 0}
             };
 
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "m:n:i:o:p:ft:s", long_options, &option_index);
+        c = getopt_long (argc, argv, "m:n:i:o:p:ft:sh", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -236,13 +237,16 @@ int process_opts(int argc, char *const *argv) {
         case 'p':
             printf("[ INFO ] Preset: %s\n", optarg);
             mode = MODE_PRESET;
-            if (!strcmp(optarg, "macculloch")) {
+            if (!strcmp(optarg, "mcculloch")) {
                 preset = PRESET_MCCULLOCH;
             } else {
                 printf("[ ERROR] Unrecogniced preset: %s\n", optarg);
                 return -1;
             }
             break;
+        case 'h':
+            print_help();
+            exit(0);
         case '?':
         default:
             return -1;
@@ -260,7 +264,7 @@ int process_opts(int argc, char *const *argv) {
 void print_help() {
     printf("[ INFO ] Usage:\n");
     printf("             neural-network -m MODE -i INPUT -o OUTPUT    [-n NETWORK -s -t PERCEN -e EPOCHS -f]\n");
-    printf("             neural-network -p PRESET [-n NETWORK -i INPUT -o OUTPUT]\n");
+    printf("             neural-network -p PRESET                     [-n NETWORK -i INPUT -o OUTPUT]\n");
     printf("         Options:\n");
     printf("             -m, --mode:           Neuron mode [perceptron, adaline].\n");
     printf("             -n, --neural-network: File with network description.\n");
@@ -268,8 +272,9 @@ void print_help() {
     printf("             -o, --ouput-file:     File to write the output of the network.\n");
     printf("             -e, --max-epochs:     Maximum number of epochs to train.\n");
     printf("             -f, --predict:        Activates the predict mode.\n");
-    printf("             -p, --preset:         Load a predefined network [macculloch].\n");
+    printf("             -p, --preset:         Load a predefined network [mcculloch].\n");
     printf("             -s, --save:           Writes the resulting network to NETWORK file.\n");
-    printf("             -t, --percent:        Percen of train.\n");
+    printf("             -t, --train-percent:  Percent of train (integer value in range 0-100).\n");
+    printf("             -h, --help:           Displays this help.\n");
 
 }
