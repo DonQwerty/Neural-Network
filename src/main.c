@@ -12,6 +12,7 @@
 #define MODE_PERCEPTRON   0
 #define MODE_ADELINE      1
 #define MODE_PRESET       2
+#define MODE_MULTILAYER       3
 /* Presets */
 #define PRESET_MCCULLOCH  0
 
@@ -31,6 +32,7 @@ char * output_file  = "/dev/null";
 int predict_flag    = 0;
 int save_flag       = 0;
 int percen          = -1;
+double learning_rate =  0;
 
 /* Stores the values for the options in the propper global variables */
 int process_opts(int argc, char *const *argv);
@@ -144,12 +146,12 @@ int main(int argc, char *argv[]){
         case MODE_PERCEPTRON:
             nn_set_function_neuron(nn , upd_neuron_perceptron);
             nn_set_function_weight(nn , upd_weights_perceptron);
-            nnc_set_training_parameters(nnc, 0, 1, 0);
+            nnc_set_training_parameters(nnc, learning_rate, 1, 0);
             break;
         case MODE_ADELINE:
             nn_set_function_neuron(nn , upd_neuron_adeline);
             nn_set_function_weight(nn , upd_weights_adeline);
-            nnc_set_training_parameters(nnc, 0, 1, 1);
+            nnc_set_training_parameters(nnc, learning_rate, 1, 1);
             break;
         }
         fflush(stdout);
@@ -184,6 +186,7 @@ int process_opts(int argc, char *const *argv) {
                 {"preset",          required_argument,  0, 'p'},
                 {"predict",         no_argument,        0, 'f'},
                 {"train-percent",   required_argument,  0, 't'},
+				{"learning-rate",   required_argument,  0, 'l'},
                 {"save-file",       no_argument,        0, 's'},
                 {"help",            no_argument,        0, 'h'},
                 {0, 0, 0, 0}
@@ -191,7 +194,7 @@ int process_opts(int argc, char *const *argv) {
 
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "m:n:i:o:p:ft:sh", long_options, &option_index);
+        c = getopt_long (argc, argv, "m:n:i:o:p:ft:shl:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -204,6 +207,8 @@ int process_opts(int argc, char *const *argv) {
                 mode = MODE_PERCEPTRON;
             } else if (!strcmp(optarg, "adaline")) {
                 mode = MODE_ADELINE;
+            } else if (!strcmp(optarg, "multilayer")) {
+                mode = MODE_MULTILAYER;
             } else {
                 printf("[ ERROR] Unrecogniced mode: %s\n", optarg);
                 return -1;
@@ -230,6 +235,9 @@ int process_opts(int argc, char *const *argv) {
             break;
         case 't':
             percen = atoi(optarg);
+            break;
+		case 'l':
+            learning_rate = atof(optarg);
             break;
         case 's':
             save_flag = 1;
@@ -266,7 +274,7 @@ void print_help() {
     printf("             neural-network -m MODE -i INPUT -o OUTPUT    [-n NETWORK -s -t PERCEN -e EPOCHS -f]\n");
     printf("             neural-network -p PRESET                     [-n NETWORK -i INPUT -o OUTPUT]\n");
     printf("         Options:\n");
-    printf("             -m, --mode:           Neuron mode [perceptron, adaline].\n");
+    printf("             -m, --mode:           Neuron mode [perceptron, adaline, multilayer].\n");
     printf("             -n, --neural-network: File with network description.\n");
     printf("             -i, --input-file:     File with the inputs (or data) as rows.\n");
     printf("             -o, --ouput-file:     File to write the output of the network.\n");
@@ -275,6 +283,7 @@ void print_help() {
     printf("             -p, --preset:         Load a predefined network [mcculloch].\n");
     printf("             -s, --save:           Writes the resulting network to NETWORK file.\n");
     printf("             -t, --train-percent:  Percent of train (integer value in range 0-100).\n");
+	printf("             -l, --learning-rate:  Learning rate (double value in range 0-1).\n");
     printf("             -h, --help:           Displays this help.\n");
 
 }
