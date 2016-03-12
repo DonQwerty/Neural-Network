@@ -1,24 +1,23 @@
-
-    #######################################
-    #     	    MAKEFILE				  #
-    # 									  #
-    # AUTHORS: Ares Aguilar Sotos		  #
-    # 	       Daniel Gimenez Llorente	  #
-    #######################################
+###########################################
+#				MAKEFILE				  #
+#										  #
+#  AUTHORS: Ares Aguilar Sotos			  #
+#			Daniel Gimenez Llorente		  #
+###########################################
 
 # ARGUMENTS
-INPUT_FILE  ?= no_input
+INPUT_FILE	?= no_input
 OUTPUT_FILE ?= out/out.txt
 
 # INPUT FILES
-P1_FILE      = data/databases/problema_real1.txt
-P2_FILE      = data/databases/problema_real2.txt
-P2_NE_FILE   = data/databases/problema_real2_no_etiquetados.txt
-NAND_FILE    = data/databases/nand.txt
-NOR_FILE     = data/databases/nor.txt
-XOR_FILE     = data/databases/xor.txt
+P1_FILE		 = data/databases/problema_real1.txt
+P2_FILE		 = data/databases/problema_real2.txt
+P2_NE_FILE	 = data/databases/problema_real2_no_etiquetados.txt
+NAND_FILE	 = data/databases/nand.txt
+NOR_FILE	 = data/databases/nor.txt
+XOR_FILE	 = data/databases/xor.txt
 PERCEPTRON_FILE = data/models/perceptron.txt
-ADALINE_FILE    = data/models/adaline.txt
+ADALINE_FILE	= data/models/adaline.txt
 
 # DIRECTORIES
 IDIR		= include
@@ -29,9 +28,9 @@ BDIR		= bin
 # FILES
 TARGET		= neural-network
 SOURCES		:= $(wildcard $(SDIR)/*.c)
-INCLUDES 	:= $(wildcard $(IDIR)/*.h)
-OBJECTS  	:= $(SOURCES:$(SDIR)/%.c=$(ODIR)/%.o)
-CHK_SOURCES	:= $(SOURCES) $(INCLUDES)
+INCLUDES	:= $(wildcard $(IDIR)/*.h)
+OBJECTS		:= $(SOURCES:$(SDIR)/%.c=$(ODIR)/%.o)
+CHK_SOURCES := $(SOURCES) $(INCLUDES)
 
 # VARIABLES
 # Compiler
@@ -42,7 +41,7 @@ LINKER		= gcc -o
 LFLAGS		= -Wall -I$(IDIR) -lm
 # Others
 rm			= rm -f
-ln          = ln -sf
+ln			= ln -sf
 
 # Compiles all programs in project
 compile: $(BDIR)/$(TARGET)
@@ -151,37 +150,37 @@ check-syntax:
 help:
 	@echo "NEURAL NETWORK MAKEFILE"
 	@echo "Targets:"
-	@echo "   - compile"
-	@echo "         Compiles all sources and generates the executable."
-	@echo "   - p1.2-mcculloch-pitts"
-	@echo "         Executes the McCulloch-Pitts network."
-	@echo "   - p1.3.1-perceptron"
-	@echo "         Executes the perceptron classifier for dataset problema_real1.txt."
-	@echo "   - p1.3.1-adaline"
-	@echo "         Executes the adaline classifier for dataset problema_real1.txt."
-	@echo "   - p1.3.2-nand"
-	@echo "         Executes the simulation for nand.txt."
-	@echo "   - p1.3.2-nor"
-	@echo "         Executes the simulation for nor.txt."
-	@echo "   - p1.3.2-xor"
-	@echo "         Executes the simulation for xor.txt."
-	@echo "   - p1.3.3-perceptron"
-	@echo "         Executes the perceptron classifier for dataset problema_real2.txt."
-	@echo "   - p1.3.3-adaline"
-	@echo "         Executes the adaline classifier for dataset problema_real2.txt."
-	@echo "   - p1.3.3.1-perceptron-predict"
-	@echo "         Executes the perceptron classifier for dataset problema_real2.txt and predicts problema_real2_no_etiquetados.txt."
-	@echo "   - p1.3.3.1-adaline-predict"
-	@echo "         Executes the adaline classifier for dataset problema_real2.txt and predicts problema_real2_no_etiquetados.txt."
-	@echo "   - clean"
-	@echo "         Removes all objects."
-	@echo "   - help"
-	@echo "         Shows this help."
+	@echo "	  - compile"
+	@echo "			Compiles all sources and generates the executable."
+	@echo "	  - p1.2-mcculloch-pitts"
+	@echo "			Executes the McCulloch-Pitts network."
+	@echo "	  - p1.3.1-perceptron"
+	@echo "			Executes the perceptron classifier for dataset problema_real1.txt."
+	@echo "	  - p1.3.1-adaline"
+	@echo "			Executes the adaline classifier for dataset problema_real1.txt."
+	@echo "	  - p1.3.2-nand"
+	@echo "			Executes the simulation for nand.txt."
+	@echo "	  - p1.3.2-nor"
+	@echo "			Executes the simulation for nor.txt."
+	@echo "	  - p1.3.2-xor"
+	@echo "			Executes the simulation for xor.txt."
+	@echo "	  - p1.3.3-perceptron"
+	@echo "			Executes the perceptron classifier for dataset problema_real2.txt."
+	@echo "	  - p1.3.3-adaline"
+	@echo "			Executes the adaline classifier for dataset problema_real2.txt."
+	@echo "	  - p1.3.3.1-perceptron-predict"
+	@echo "			Executes the perceptron classifier for dataset problema_real2.txt and predicts problema_real2_no_etiquetados.txt."
+	@echo "	  - p1.3.3.1-adaline-predict"
+	@echo "			Executes the adaline classifier for dataset problema_real2.txt and predicts problema_real2_no_etiquetados.txt."
+	@echo "	  - clean"
+	@echo "			Removes all objects."
+	@echo "	  - help"
+	@echo "			Shows this help."
 	@echo "Arguments:"
-	@echo "   - INPUT_FILE"
-	@echo "         File to read from"
-	@echo "   - OUTPUT_FILE"
-	@echo "         File to write to. out/out.txt by default"
+	@echo "	  - INPUT_FILE"
+	@echo "			File to read from"
+	@echo "	  - OUTPUT_FILE"
+	@echo "			File to write to. out/out.txt by default"
 
 .PHONEY: clean
 clean:

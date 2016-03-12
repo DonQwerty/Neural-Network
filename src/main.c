@@ -23,16 +23,21 @@ static const char P_MCCULLOCH_OUTPUT[]      = "out/McCulloch-Pitts.txt";
 
 
 /* Global variables for options processing */
+/* Variables */
 int mode            = -1;
 int preset          = -1;
 int max_epochs      = -1;
+int percen          = -1;
+int hidden_neurons  = 0;
+double learning_rate =  0;
+/* Flags */
+int predict_flag    = 0;
+int save_flag       = 0;
+/* Files */
 char * neural_file  = NULL;
 char * input_file   = NULL;
 char * output_file  = "/dev/null";
-int predict_flag    = 0;
-int save_flag       = 0;
-int percen          = -1;
-double learning_rate =  0;
+char * stats_file   = "out/stats.csv";
 
 /* Stores the values for the options in the propper global variables */
 int process_opts(int argc, char *const *argv);
@@ -95,13 +100,13 @@ int main(int argc, char *argv[]){
                 nn_free(nn);
                 return -1;
             }
-            
+
             while(fgets(text,20,f_in)){
                 ptr = strtok(text,SEP);
                 values[0] = atof(ptr);
                 for(j=1 ; j < 3; j++){
                     ptr = strtok(NULL,SEP);
-                    values[j] = atof(ptr); 
+                    values[j] = atof(ptr);
                 }
                 nn_update_neurons(nn, values, 3, 1,0);
                 fprint_output(nn, f_out);
@@ -110,7 +115,7 @@ int main(int argc, char *argv[]){
             nn_free(nn);
             fclose(f_in);
             fclose(f_out);
-            
+
             break;
         }
         return 0;
@@ -135,9 +140,9 @@ int main(int argc, char *argv[]){
             printf("[ ERROR] Error reading neural network file.\n");
             return -1;
         }
-        
+
         /* Create Classifier */
-        nnc = nnc_new(output_file);
+        nnc = nnc_new(output_file, stats_file);
         nnc_set_data(nnc, data, predict_flag, percen);
         nnc_set_neural_network(nnc, nn);
 
@@ -167,7 +172,7 @@ int main(int argc, char *argv[]){
         if(!predict_flag) nnc_print_info(nnc);
         nnc_free(nnc);
     }
-    
+
     return 0;
 }
 
@@ -183,18 +188,20 @@ int process_opts(int argc, char *const *argv) {
                 {"neural-network",  required_argument,  0, 'n'},
                 {"input-file",      required_argument,  0, 'i'},
                 {"output-file",     required_argument,  0, 'o'},
+                {"stats-file",      required_argument,  0, 'c'},
                 {"preset",          required_argument,  0, 'p'},
+                {"hidden-neurons",  required_argument,  0, 'h'},
                 {"predict",         no_argument,        0, 'f'},
                 {"train-percent",   required_argument,  0, 't'},
-				{"learning-rate",   required_argument,  0, 'l'},
+                {"learning-rate",   required_argument,  0, 'l'},
                 {"save-file",       no_argument,        0, 's'},
-                {"help",            no_argument,        0, 'h'},
+                {"help",            no_argument,        0, 'k'},
                 {0, 0, 0, 0}
             };
 
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "m:n:i:o:p:ft:shl:", long_options, &option_index);
+        c = getopt_long (argc, argv, "m:n:i:o:p:ft:skl:c:h:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -226,6 +233,10 @@ int process_opts(int argc, char *const *argv) {
             printf("[ INFO ] Output file: %s\n", optarg);
             output_file = strdup(optarg);
             break;
+        case 'c':
+            printf("[ INFO ] Stats file: %s\n", optarg);
+            stats_file = strdup(optarg);
+            break;
         case 'f':
             printf("[ INFO ] Prediction mode: predictions written to output_file\n");
             predict_flag = 1;
@@ -236,8 +247,11 @@ int process_opts(int argc, char *const *argv) {
         case 't':
             percen = atoi(optarg);
             break;
-		case 'l':
+        case 'l':
             learning_rate = atof(optarg);
+            break;
+        case 'h':
+            hidden_neurons = atoi(optarg);
             break;
         case 's':
             save_flag = 1;
@@ -252,7 +266,7 @@ int process_opts(int argc, char *const *argv) {
                 return -1;
             }
             break;
-        case 'h':
+        case 'k':
             print_help();
             exit(0);
         case '?':
@@ -278,12 +292,13 @@ void print_help() {
     printf("             -n, --neural-network: File with network description.\n");
     printf("             -i, --input-file:     File with the inputs (or data) as rows.\n");
     printf("             -o, --ouput-file:     File to write the output of the network.\n");
+    printf("             -c, --stats-file:     File to write the stats of the network.\n");
     printf("             -e, --max-epochs:     Maximum number of epochs to train.\n");
     printf("             -f, --predict:        Activates the predict mode.\n");
     printf("             -p, --preset:         Load a predefined network [mcculloch].\n");
     printf("             -s, --save:           Writes the resulting network to NETWORK file.\n");
     printf("             -t, --train-percent:  Percent of train (integer value in range 0-100).\n");
-	printf("             -l, --learning-rate:  Learning rate (double value in range 0-1).\n");
+    printf("             -l, --learning-rate:  Learning rate (double value in range 0-1).\n");
     printf("             -h, --help:           Displays this help.\n");
 
 }

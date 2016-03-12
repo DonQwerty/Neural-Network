@@ -10,19 +10,19 @@
 #define DEF_GENERALIZATION_PERCENT 20.0
 #define DEF_VALIDATION_PERCENT     20.0
 #define DEF_LEARNING_RATE          0.02
-#define DEF_MAX_EPOCHS             1500
+#define DEF_MAX_EPOCHS             1000
 #define DEF_MAX_ACCURACY           95
 #define DEF_MAX_MSE                0.001
 
 typedef struct Classifier_ {
-    
+
     /* Classifier Variables */
     Neural_Network * nn;
     Data           * data_training;
     Data           * data_generalization;
     Data           * data_validation;
     int              epoch;
-    
+
     /* Classifier Parameters */
     double learning_rate;
     int    max_epochs;
@@ -30,7 +30,7 @@ typedef struct Classifier_ {
     double max_mse;
     int bipolar;
     int function_transfer;
-    
+
     /* Epoch Statistics */
     FILE * file_statistics;
 
@@ -44,13 +44,13 @@ typedef struct Classifier_ {
     double mse_training;
     double mse_generalization;
     double mse_validation;
-    
+
 } Classifier;
 
 
 /* Public Methods */
 /* Allocates memory for the classifier with default parameters */
-Classifier * nnc_new(char * output);
+Classifier * nnc_new(char * output, char * stats_file);
 
 /* Changes the parameters. If NULL, the default value is used */
 int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar, int function_transfer);
