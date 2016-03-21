@@ -5,6 +5,7 @@
 /* Structures definitions */
 typedef struct Connection_ {
     double weight;
+    double delta;
     struct Neuron_ * from;
 } Connection;
 
@@ -127,6 +128,7 @@ double threshold_neuron_get(Neuron n);
 Connection * connections_neuron_get(Neuron n);
 
 double weight_connecion_get(Connection  c);
+double connection_get_delta(Connection  c);
 Neuron *  neuron_from_connecion_get(Connection  c);
 
 
@@ -136,6 +138,7 @@ void value_neuron_set(Neuron * n, double v);
 void new_value_neuron_set(Neuron * n, double v);
 
 void weight_connection_set(Connection * c, double weight);
+void connection_set_delta(Connection * c, double delta);
 
 void nn_set_function_weight(Neural_Network * nn, nn_upd_weight upd);
 void nn_set_function_neuron(Neural_Network * nn, nn_upd_neuron upd);

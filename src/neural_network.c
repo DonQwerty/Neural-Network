@@ -301,6 +301,13 @@ void nn_update_weights(Neural_Network * nn, double alpha, double * t){
     }
 }
 
+void nn_update_weights_multilayer(Neural_Network * nn, double alpha, double * t){
+    //int i,j=0;
+    Neural_Layer * output = &(layers_get(*nn)[n_layers_get(*nn)-1]);
+
+    //holis
+}
+
 
 
 /* Private Methods */
@@ -451,6 +458,11 @@ Neuron *  neuron_from_connecion_get(Connection  c){
 	return c.from;
 }
 
+double connection_get_delta(Connection  c){
+    return c.delta;
+}
+
+
 /*Setters*/
 
 void value_neuron_set(Neuron * n, double v){
@@ -463,6 +475,11 @@ void new_value_neuron_set(Neuron * n, double v){
 void weight_connection_set(Connection * c, double weight){
 	c->weight = weight;
 }
+
+void connection_set_delta(Connection * c, double delta){
+    c->delta = delta;
+}
+
 
 void nn_set_function_weight(Neural_Network * nn, nn_upd_weight upd){
     nn->upd_weight = upd;
