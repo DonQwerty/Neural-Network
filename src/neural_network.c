@@ -24,7 +24,7 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
     for (i = 0; i < n_neurons_total; i++) {
         neuron_init(neurons_arr + i,thresholds[i]);
     }
-    
+
     /* Allocates memory for the network */
     nn = (Neural_Network *) malloc(sizeof(Neural_Network));
     if (!nn) {
@@ -48,7 +48,7 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
         layer_init(&(nn->layers[i]), n_neurons_layer[i], neurons_arr + offset);
         offset += n_neurons_layer[i];
     }
-    
+
     return nn;
 }
 
@@ -69,8 +69,8 @@ Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar , in
    // }
     n_neurons_layer[0] = n_attrs+sesg;
     n_neurons_layer[1] = (bipolar ==  1) ? 1 : n_clas;
-    
-   
+
+
     n_neurons = 0;
     for (i = 0; i < n_layers; i++) {
         n_neurons += n_neurons_layer[i];
@@ -112,7 +112,7 @@ int nn_save_to_file(Neural_Network * nn, const char * file) {
    Neuron * cur_neuron;
    int n_neurons, n_cur_neuron;
    int i, j;
-   
+
    f = fopen(file, "w");
    if (!f) return -1;
 
@@ -137,21 +137,21 @@ int nn_save_to_file(Neural_Network * nn, const char * file) {
            }
        } else {
            /* This neuron does not have all connections */
-           
+
                for (i = 0; i < n_neurons; i++) {
                     for (j = 0 ; j < cur_neuron->n_cons ; j++){
                         if (&(nn_array(nn)[i]) == cur_neuron->cons[j].from) {
                             fprintf(f, "%lf ", cur_neuron->cons[j].weight);
                             break;
-                        } 
+                        }
                    }
                    if(j == cur_neuron->n_cons)
                        fprintf(f, "0.0 ");
-                  
+
                }
-           
+
        }
-           
+
        fprintf(f, "\n");
    }
    fclose(f);
@@ -164,10 +164,10 @@ Neural_Network * nn_read_from_file(const char * file) {
     FILE * f;
     int n_layers, n_neurons;
     int * n_neurons_layer;
-	double * thresholds;
+    double * thresholds;
     double * cons;
     int i, j, count;
-    
+
     f = fopen(file, "r");
     if (!f) return NULL;
 
@@ -251,7 +251,7 @@ void nn_free(Neural_Network * nn) {
     for (i = 0; i < nn->n_neurons; i++) {
         free(nn_array(nn)[i].cons);
     }
-    
+
     /* Free neurons */
     free(nn_array(nn));
 
@@ -288,9 +288,30 @@ void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int d
     set_entry_neural_network(nn, values, n_values, discrete,  sesg);
     for (i = n_values + sesg; i < nn->n_neurons; i++) {
         (*nn->upd_neuron)(&nn_array(nn)[i]);
+        // Set error = 0 in case of backpropagation
+        nn_array(nn)[i].err = 0;
     }
-	if(discrete)
-		nn_keep_value_neurons(nn);
+    if(discrete)
+        nn_keep_value_neurons(nn);
+}
+
+void nn_compute_out_err(Neural_Network * nn, double * values) {
+    Neural_Layer * output;
+    Neuron * neurons;
+    Neuron * cur;
+    int i;
+
+    output = nn_get_layers(nn) + nn_get_n_layers(nn) - 1;
+    neurons = layer_get_neurons(output);
+    for (i = 0; i < layer_get_n_neurons(output); i++) {
+        cur = neurons + i;
+        neuron_set_err(cur, values[i] - neuron_get_new_value(cur));
+    }
+
+}
+
+void neuron_set_err(Neuron * n, double err) {
+    n->err = err;
 }
 
 void nn_update_weights(Neural_Network * nn, double alpha, double * t){
@@ -301,13 +322,6 @@ void nn_update_weights(Neural_Network * nn, double alpha, double * t){
     }
 }
 
-void nn_update_weights_multilayer(Neural_Network * nn, double alpha, double * t){
-    //int i,j=0;
-    Neural_Layer * output = &(layers_get(*nn)[n_layers_get(*nn)-1]);
-
-    //holis
-}
-
 
 
 /* Private Methods */
@@ -316,7 +330,7 @@ int nn_connect_neuron(Neural_Network * nn, int n_neuron_to, double * w_neurons_f
     Neuron * n_to;
     int n_connections;
     int i;
-    
+
     if (!nn | !w_neurons_from) return -1;
 
     /* Get total number of connections */
@@ -355,16 +369,22 @@ int nn_keep_value_neurons(Neural_Network * nn){
     return 0;
 }
 
+double neuron_get_err(Neuron * n) {
+    return n->err;
+}
 
+double neuron_get_d_in(Neuron * n) {
+    return n->d_in;
+}
 
 void set_entry_neural_network(Neural_Network * nn, double * values, int n_values, int discrete, int sesg){
     int i;
     /* Init values */
     for (i = 0; i < n_values; i++) {
-    	if(discrete)
-        	nn_array(nn)[i].d_new = values[i];
-       	else
-       		nn_array(nn)[i].d = values[i];
+        if(discrete)
+            nn_array(nn)[i].d_new = values[i];
+        else
+            nn_array(nn)[i].d = values[i];
     }
     if(sesg) nn_array(nn)[i].d = 1;
 }
@@ -396,84 +416,83 @@ int neuron_update(Neuron * n) {
     return 0;
 }
 
-double * nn_get_output(Neural_Network nn){
+double * nn_get_output(Neural_Network * nn){
     int i;
-    int n = nn.layers[nn.n_layers-1].n_neurons;
+    int n = nn->layers[nn->n_layers-1].n_neurons;
     double * values = (double *) malloc(n * sizeof(double));
 
     if (!values) return NULL;
 
     for( i = 0 ; i< n ; i++ ){
-        values[i] = nn.layers[nn.n_layers-1].neurons[i].d;
-        
+        values[i] = nn->layers[nn->n_layers-1].neurons[i].d;
+
     }
- 
+
     return values;
 }
 
 /*Getters */
-int n_neurons_nn_get(Neural_Network n){
-	return n.n_neurons;
+int nn_get_n_neurons(Neural_Network * n){
+    return n->n_neurons;
 }
-int n_layers_get(Neural_Network n){
-	return n.n_layers;
-}
-
-Neural_Layer * layers_get(Neural_Network n){
-	return n.layers;
+int nn_get_n_layers(Neural_Network * n){
+    return n->n_layers;
 }
 
-int n_neurons_layer_get(Neural_Layer nl){
-	return nl.n_neurons;
-}
-Neuron * neurons_layer_get(Neural_Layer nl){
-	return nl.neurons;
+Neural_Layer * nn_get_layers(Neural_Network * n){
+    return n->layers;
 }
 
-double value_neuron_get(Neuron n){
-	return n.d;
+int layer_get_n_neurons(Neural_Layer * nl){
+    return nl->n_neurons;
+}
+Neuron * layer_get_neurons(Neural_Layer * nl){
+    return nl->neurons;
 }
 
-double new_value_neuron_get(Neuron n){
-	return n.d_new;
+double neuron_get_value(Neuron * n){
+    return n->d;
 }
 
-int n_cons_neuron_get(Neuron  n){
-	return n.n_cons;
+double neuron_get_new_value(Neuron * n){
+    return n->d_new;
 }
 
-double threshold_neuron_get(Neuron  n){
-	return n.threshold;
+int neuron_get_n_cons(Neuron * n){
+    return n->n_cons;
 }
 
-Connection * connections_neuron_get(Neuron  n){
-	return n.cons;
+double neuron_get_threshold(Neuron * n){
+    return n->threshold;
 }
 
-double weight_connecion_get(Connection  c){
-	return c.weight;
+Connection * neuron_get_connections(Neuron * n){
+    return n->cons;
 }
 
-Neuron *  neuron_from_connecion_get(Connection  c){
-	return c.from;
+double connection_get_weight(Connection * c){
+    return c->weight;
 }
 
-double connection_get_delta(Connection  c){
-    return c.delta;
+Neuron *  connection_get_neuron_from(Connection * c){
+    return c->from;
+}
+
+double connection_get_delta(Connection * c){
+    return c->delta;
 }
 
 
 /*Setters*/
-
 void value_neuron_set(Neuron * n, double v){
-	n->d = v;
+    n->d = v;
 }
 
 void new_value_neuron_set(Neuron * n, double v){
-	n->d_new = v;
+    n->d_new = v;
 }
 void weight_connection_set(Connection * c, double weight){
-	c->weight = weight;
+    c->weight = weight;
 }
 
 void connection_set_delta(Connection * c, double delta){
@@ -487,4 +506,20 @@ void nn_set_function_weight(Neural_Network * nn, nn_upd_weight upd){
 void nn_set_function_neuron(Neural_Network * nn, nn_upd_neuron upd){
     nn->upd_neuron = upd;
 
+}
+
+double neuron_get_input(Neuron * neuron) {
+    int i;
+    double value, weight;
+    Connection * c;
+
+    value = 0;
+    c = neuron_get_connections(neuron);
+    for ( i = 0; i < neuron_get_n_cons(neuron); i++){
+        weight = connection_get_weight(c + i);
+        Neuron * n = connection_get_neuron_from(c + i);
+        value += weight * neuron_get_value(n);
+    }
+    neuron->d_in = value;
+    return value;
 }

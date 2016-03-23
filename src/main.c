@@ -161,8 +161,9 @@ int main(int argc, char *argv[]){
             nnc_set_training_parameters(nnc, learning_rate, 1, 1);
             break;
         case MODE_MULTILAYER:
-            // TODO Terminar
             nn_set_function_neuron(nn, upd_neuron_sigmoid);
+            nn_set_function_weight(nn, upd_weights_sigmoid);
+            //TODO que parameters poner?????
         }
         fflush(stdout);
         if(max_epochs != -1){

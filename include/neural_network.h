@@ -10,11 +10,12 @@ typedef struct Connection_ {
 } Connection;
 
 typedef struct Neuron_ {
+    double d_in;                   /* Used in backpropagation */
     double d;
     double d_new;                  /* Neuron's value */
     double err;                    /* Error, for training purposes */
     int n_cons;                    /* Number of connections */
-    double threshold;                 
+    double threshold;
     Connection * cons;             /* Neuron's connections */
 } Neuron;
 
@@ -57,7 +58,7 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
    1.0 1.0 0.0 0.0 0.0 0.0
    0.0 1.0 0.0 0.0 0.0 0.0
    0.0 0.0 1.0 1.0 1.0 0.0
-   
+
 */
 Neural_Network * nn_read_from_file(const char * file);
 
@@ -90,7 +91,6 @@ void nn_update_neurons(Neural_Network * nn, double * values, int n_values, int d
 void nn_update_weights(Neural_Network * nn, double alpha, double * t);
 
 
-
 /* Private Methods */
 /* Neural Network Methods */
 /* Access the network array of neurons */
@@ -109,33 +109,38 @@ int layer_init(Neural_Layer * l, int n_neurons, Neuron * first);
 int neuron_init(Neuron * n,double threshold);
 /* Updates the values for a neuron */
 int neuron_update(Neuron * n);
+double neuron_get_input(Neuron * n);
 
 /*Return the last layer of the neural network*/
-double * nn_get_output(Neural_Network nn);
+double * nn_get_output(Neural_Network * nn);
+
+void nn_compute_out_err(Neural_Network * nn, double * values);
 
 /*Getters */
-int n_neurons_nn_get(Neural_Network n);
-int n_layers_get(Neural_Network n);
-Neural_Layer * layers_get(Neural_Network n);
+int nn_get_n_neurons(Neural_Network * n);
+int nn_get_n_layers(Neural_Network *  n);
+Neural_Layer * nn_get_layers(Neural_Network * n);
 
-int n_neurons_layer_get(Neural_Layer nl);
-Neuron * neurons_layer_get(Neural_Layer nl);
+int layer_get_n_neurons(Neural_Layer * nl);
+Neuron * layer_get_neurons(Neural_Layer * nl);
 
-double value_neuron_get(Neuron n);
-double new_value_neuron_get(Neuron n);
-int n_cons_neuron_get(Neuron n);
-double threshold_neuron_get(Neuron n);
-Connection * connections_neuron_get(Neuron n);
-
-double weight_connecion_get(Connection  c);
-double connection_get_delta(Connection  c);
-Neuron *  neuron_from_connecion_get(Connection  c);
+double neuron_get_value(Neuron * n);
+double neuron_get_new_value(Neuron * n);
+int neuron_get_n_cons(Neuron * n);
+double neuron_get_threshold(Neuron * n);
+Connection * neuron_get_connections(Neuron * n);
+double neuron_get_err(Neuron * n);
+double neuron_get_d_in(Neuron * n);
+double connection_get_weight(Connection *  c);
+double connection_get_delta(Connection * c);
+Neuron * connection_get_neuron_from(Connection * c);
 
 
 /*Setters*/
 
 void value_neuron_set(Neuron * n, double v);
 void new_value_neuron_set(Neuron * n, double v);
+void neuron_set_err(Neuron * n, double err);
 
 void weight_connection_set(Connection * c, double weight);
 void connection_set_delta(Connection * c, double delta);
