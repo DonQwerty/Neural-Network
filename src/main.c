@@ -12,7 +12,7 @@
 #define MODE_PERCEPTRON   0
 #define MODE_ADELINE      1
 #define MODE_PRESET       2
-#define MODE_MULTILAYER       3
+#define MODE_MULTILAYER   3
 /* Presets */
 #define PRESET_MCCULLOCH  0
 
@@ -21,6 +21,7 @@ static const char P_MCCULLOCH_NEURAL[]      = "data/models/McCulloch-Pitts.txt";
 static const char P_MCCULLOCH_INPUT[]       = "data/databases/McCulloch-Pitts.txt";
 static const char P_MCCULLOCH_OUTPUT[]      = "out/McCulloch-Pitts.txt";
 
+#define MAX_LEN_STR 50
 
 /* Global variables for options processing */
 /* Variables */
@@ -28,16 +29,16 @@ int mode            = -1;
 int preset          = -1;
 int max_epochs      = -1;
 int percen          = -1;
-int hidden_neurons  = 0;
-double learning_rate =  0;
+int hidden_neurons  =  0;
+double learning_rate = 0;
 /* Flags */
 int predict_flag    = 0;
 int save_flag       = 0;
 /* Files */
-char * neural_file  = NULL;
-char * input_file   = NULL;
-char * output_file  = "/dev/null";
-char * stats_file   = "out/stats.csv";
+char neural_file[MAX_LEN_STR]  = "no_file";
+char input_file[MAX_LEN_STR]   = "no_file";
+char output_file[MAX_LEN_STR]  = "/dev/null";
+char stats_file[MAX_LEN_STR]   = "out/stats.csv";
 
 /* Stores the values for the options in the propper global variables */
 int process_opts(int argc, char *const *argv);
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]){
     if (mode == MODE_PRESET) {
         switch (preset) {
         case PRESET_MCCULLOCH:
-            if (neural_file) {
+            if (strcmp("no_file", neural_file) != 0) {
                 nn = nn_read_from_file(neural_file);
             } else {
                 nn = nn_read_from_file(P_MCCULLOCH_NEURAL);
@@ -79,7 +80,7 @@ int main(int argc, char *argv[]){
             }
             nn_set_function_neuron(nn , upd_neuron_mcculloch_pitts);
             values = (double*) malloc(3 * sizeof(double));
-            if (input_file) {
+            if (strcmp("no_file", input_file) != 0) {
                 f_in = fopen(input_file, "r");
             } else {
                 f_in = fopen(P_MCCULLOCH_INPUT,"r");
@@ -89,7 +90,7 @@ int main(int argc, char *argv[]){
                 nn_free(nn);
                 return -1;
             }
-            if (output_file) {
+            if (strcmp("no_file", output_file) != 0) {
                 f_out = fopen(output_file, "w");
             } else {
                 f_out = fopen(P_MCCULLOCH_OUTPUT ,"w");
@@ -131,13 +132,14 @@ int main(int argc, char *argv[]){
         n_attrs = sample_get_n_attrs(*(data_get_samples(*data)[0]));
         n_clases = data_get_n_classes(*data);
         /* Create network */
-        if (neural_file && save_flag==0) {
+        if ((strcmp("no_file", neural_file) != 0) && save_flag==0) {
             nn = nn_read_from_file(neural_file);
         } else {
-            nn = nn_init(n_attrs, n_clases,2, 1 ,1);
+            nn = nn_init(n_attrs, n_clases, 2, 1, 1);
         }
         if (!nn) {
             printf("[ ERROR] Error reading neural network file.\n");
+            data_free(data);
             return -1;
         }
 
@@ -158,10 +160,13 @@ int main(int argc, char *argv[]){
             nn_set_function_weight(nn , upd_weights_adeline);
             nnc_set_training_parameters(nnc, learning_rate, 1, 1);
             break;
+        case MODE_MULTILAYER:
+            // TODO Terminar
+            nn_set_function_neuron(nn, upd_neuron_sigmoid);
         }
         fflush(stdout);
-        if(max_epochs!=-1){
-            nnc_set_stopping_conditions(nnc,max_epochs,0,0);
+        if(max_epochs != -1){
+            nnc_set_stopping_conditions(nnc, max_epochs, 0, 0);
         }
         if (!predict_flag)
             /* No predictions file. Train network */
@@ -223,19 +228,19 @@ int process_opts(int argc, char *const *argv) {
             break;
         case 'n':
             printf("[ INFO ] Neural Network: %s\n", optarg);
-            neural_file = strdup(optarg);
+            strncpy(neural_file, optarg, MAX_LEN_STR);
             break;
         case 'i':
             printf("[ INFO ] Input file: %s\n", optarg);
-            input_file = strdup(optarg);
+            strncpy(input_file, optarg, MAX_LEN_STR);
             break;
         case 'o':
             printf("[ INFO ] Output file: %s\n", optarg);
-            output_file = strdup(optarg);
+            strncpy(output_file, optarg, MAX_LEN_STR);
             break;
         case 'c':
             printf("[ INFO ] Stats file: %s\n", optarg);
-            stats_file = strdup(optarg);
+            strncpy(stats_file, optarg, MAX_LEN_STR);
             break;
         case 'f':
             printf("[ INFO ] Prediction mode: predictions written to output_file\n");
@@ -280,6 +285,9 @@ int process_opts(int argc, char *const *argv) {
     if ( (mode == MODE_PRESET) && (preset == -1)) {
         return -1;
     }
+    if ( (mode == MODE_MULTILAYER) && (hidden_neurons >= 0)) {
+        printf("[ WARN ] Mode set to multilayer but no neurons in hidden layer set.");
+    }
     return 0;
 }
 
@@ -293,6 +301,7 @@ void print_help() {
     printf("             -i, --input-file:     File with the inputs (or data) as rows.\n");
     printf("             -o, --ouput-file:     File to write the output of the network.\n");
     printf("             -c, --stats-file:     File to write the stats of the network.\n");
+    printf("             -h, --hidden-neurons: Number of neurons in the hidden layer.\n");
     printf("             -e, --max-epochs:     Maximum number of epochs to train.\n");
     printf("             -f, --predict:        Activates the predict mode.\n");
     printf("             -p, --preset:         Load a predefined network [mcculloch].\n");

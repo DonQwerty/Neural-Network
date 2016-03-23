@@ -92,7 +92,7 @@ int nnc_train_network(Classifier * c){
 
     double accuracy;
 
-    while(c->epoch < c->max_epochs){
+    while(nnc_check_stopping_conditions(c) != 1){
         // printf("---Epoca %d--\n" , c->epoch);
         fflush(stdout);
         nnc_run_training_epoch(c);
@@ -250,4 +250,12 @@ double nnc_run_statistics(Classifier * c){
     }
     fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));
     return ((double) sum*100 )/ data_get_n_samples(*(c->data_training));
+}
+
+int nnc_check_stopping_conditions(Classifier * c) {
+    // TODO Completar
+    if (c->epoch >= c->max_epochs) {
+        return 1;
+    }
+    return 0;
 }

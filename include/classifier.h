@@ -82,6 +82,6 @@ void nnc_run_training_epoch(Classifier * c);
 
 double nnc_run_statistics(Classifier * c);
 
-
+int nnc_check_stopping_conditions(Classifier * c);
 
 #endif /* CLASSIFIER_H */

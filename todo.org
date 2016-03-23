@@ -1,19 +1,20 @@
 * PRACTICA 2
 ** BUGFIXES de la anterior
-*** TODO Liberar Memoria
-    Liberar strdups del main.
-    Liberar data: crear data_free y data_free_keep_samples
-*** TODO Condiciones de Parada
+*** IN-PROGRESS Liberar Memoria
+**** DONE Liberar strdups del main.
+**** TODO Liberar data
+     Crear data_free y data_free_keep_samples
+*** DONE Condiciones de Parada
     Implementar condiciones segun estadisticas (funcion check_stopping_conditions())
 *** TODO Estadisticas
     Guardar en las variables de NNC los errores actualizados
 ** MAIN
-*** TODO Argumentos
+*** DONE Argumentos
     NUEVO: alpha   (learning_rate)
     NUEVO: ocultas (numero de neuronas en la capa oculta)
     MOD:   --mode multilayer (que acepta el parametro ocultas)
 ** NEURAL NETWORK FUNCTIONS
-*** TODO Implementar Sigmoidal
+*** DONE Implementar Sigmoidal
     Meter la funcion de actualizacion sigmoidal.
 ** CLASIFICADOR
 *** TODO Implementar Backtracking
