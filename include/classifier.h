@@ -30,6 +30,7 @@ typedef struct Classifier_ {
     double max_mse;
     int bipolar;
     int function_transfer;
+    int mode_unique_neuron;
 
     /* Epoch Statistics */
     FILE * file_statistics;
@@ -53,7 +54,7 @@ typedef struct Classifier_ {
 Classifier * nnc_new(char * output, char * stats_file);
 
 /* Changes the parameters. If NULL, the default value is used */
-int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar, int function_transfer);
+int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar, int function_transfer, int mode_unique_neuron);
 
 /* Receives the data and divides it into training, generalization and validation */
 int nnc_set_data(Classifier * c, Data * d, int flag, int percen);

@@ -50,10 +50,11 @@ void upd_neuron_adeline (Neuron * neuron){
 }
 
 void upd_neuron_sigmoid (Neuron * neuron) {
-    double value;
+    double value=0;
 
     value = neuron_get_input(neuron);
-    value_neuron_set(neuron, sigmoid(value));
+    if(value != 1)
+        value_neuron_set(neuron, sigmoid(value));
     return;
 }
 
@@ -95,6 +96,7 @@ void upd_weights_sigmoid (Neuron * neuron, double alpha, double t) {
     for (i = 0; i < neuron_get_n_cons(neuron); i++) {
         /* Retropropagación de error */
         from = connection_get_neuron_from(cons + i);
+
         neuron_set_err(from,
                        neuron_get_err(from) +
                        (connection_get_weight(cons + i) * err));
@@ -102,7 +104,7 @@ void upd_weights_sigmoid (Neuron * neuron, double alpha, double t) {
         /* Actualización de pesos */
         weight_connection_set(cons + i,
                               connection_get_weight(cons + i) +
-                              (alpha * err * neuron_get_new_value(from)));
+                              (alpha * err * neuron_get_value(from)));
     }
 
 }

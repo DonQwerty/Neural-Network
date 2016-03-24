@@ -17,7 +17,7 @@ typedef struct Data_ {
 
 /* Public Methods */
 void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen);
-Data * data_from_file(char * file,int percep);
+Data * data_from_file(char * file,int unique);
 void data_free(Data * d);
 
 /* Private Methods */
@@ -25,7 +25,7 @@ Data * data_new();
 int data_init(Data * d, int n_classes, int n_samples, int n_attrs);
 
 Sample * sample_new(int n_attrs,int n_classes);
-void sample_fill(Sample * sample, char * text,int percep);
+void sample_fill(Sample * sample, char * text,int unique);
 void sample_free(Sample * sample);
 
 /*Setter*/

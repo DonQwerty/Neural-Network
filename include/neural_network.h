@@ -62,7 +62,7 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
 */
 Neural_Network * nn_read_from_file(const char * file);
 
-Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar, int sesg);
+Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar, int sesg, int mode, int hidden_neurons);
 
 /* Reads a neural network from stdin, asking for each layer's weights */
 int nn_read_from_stdin(Neural_Network * nn);
@@ -78,6 +78,7 @@ int nn_keep_value_neurons(Neural_Network * nn);
 
 /*Prints the last layer of the neural network*/
 void fprint_output(Neural_Network * nn, FILE * f);
+void fprint_neurons(Neural_Network * nn, FILE * f);
 
 void fprint_w(Neural_Network * nn, FILE * f);
 
@@ -126,6 +127,7 @@ Neuron * layer_get_neurons(Neural_Layer * nl);
 
 double neuron_get_value(Neuron * n);
 double neuron_get_new_value(Neuron * n);
+double neuron_get_value_in(Neuron * n);
 int neuron_get_n_cons(Neuron * n);
 double neuron_get_threshold(Neuron * n);
 Connection * neuron_get_connections(Neuron * n);

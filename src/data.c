@@ -42,7 +42,7 @@ void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen
 	free(data);
 }
 
-Data * data_from_file(char * file, int percep){
+Data * data_from_file(char * file, int unique){
     FILE * f = fopen(file,"r");
     if(!f){
         perror( file);
@@ -65,7 +65,7 @@ Data * data_from_file(char * file, int percep){
     data_init(data,n_classes,n_samples,n_attrs);
     int i=0;
     while(fgets(text,100,f)){
-        sample_fill(data->samples[i],text, percep);
+        sample_fill(data->samples[i],text, unique);
         i++;
     }
     return data;
@@ -94,7 +94,7 @@ Sample * sample_new(int n_attrs,int n_classes){
   return sample;
 }
 
-void sample_fill(Sample * sample, char * text, int percep){
+void sample_fill(Sample * sample, char * text, int unique){
     int i,j;
     int class;
     char * ptr = NULL;
@@ -105,7 +105,7 @@ void sample_fill(Sample * sample, char * text, int percep){
         sample->values[i] = atof(ptr);
 
     }
-    if(percep){
+    if(unique){
       ptr = strtok(NULL,SEP);
       class = atoi(ptr); 
       

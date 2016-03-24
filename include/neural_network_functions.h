@@ -10,6 +10,7 @@ void upd_neuron_sigmoid (Neuron * neuron);
 
 void upd_weights_perceptron (Neuron * neuron,double alpha, double t);
 void upd_weights_adeline (Neuron * neuron,double alpha, double t);
+void upd_weights_sigmoid (Neuron * neuron, double alpha, double t);
 
 
 /* Helper Functions */

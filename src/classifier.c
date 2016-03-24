@@ -18,6 +18,7 @@ Classifier * nnc_new(char * output, char * stats_file) {
     c->epoch = 0;
     c->bipolar = 0;
     c->function_transfer=0;
+    c->mode_unique_neuron=0;
 
     /* Default Parameters */
     c->learning_rate = DEF_LEARNING_RATE;
@@ -37,12 +38,13 @@ Classifier * nnc_new(char * output, char * stats_file) {
     return c;
 }
 
-int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar,int function_transfer) {
+int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar,int function_transfer, int mode_unique_neuron) {
     if (!c) return -1;
 
     if (learning_rate) c->learning_rate = learning_rate;
     if (bipolar) c->bipolar = bipolar;
     if (function_transfer) c->function_transfer = function_transfer;
+    if (mode_unique_neuron) c->mode_unique_neuron = mode_unique_neuron;
 
     return 0;
 }
@@ -110,7 +112,7 @@ double nnc_classifier(Classifier * c, int predict_flag){
     double aux;
     double * output;
     int sum = 0;
-    double res;
+    double res=0;
     int n_clases = data_get_n_classes(*c->data_validation);
     for ( i = 0; i < data_get_n_samples(*(c->data_validation)); i++){
         Sample * s = data_get_samples(*(c->data_validation))[i];
@@ -118,7 +120,7 @@ double nnc_classifier(Classifier * c, int predict_flag){
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1);
         output = nn_get_output(c->nn);
         //printf("%lf %lf %lf %lf %lf\n", s->values[0],s->values[1],s->values[2],s->values[3],output[0]);
-        if(n_clases == 2 && c->bipolar==1){
+        if(c->mode_unique_neuron == 1){
             res = output[0] ;
             if(c->function_transfer){
                 res = (res < 0) ? -1 : 1;
@@ -150,7 +152,13 @@ double nnc_classifier(Classifier * c, int predict_flag){
                 if(output[sample_get_class(*s)] == 1)
                   sum++;
             }
+            if(!predict_flag)
+                fprintf(c->predictions, "%d\t%d\n",sample_get_class(*s), (int)res);
+            else
+                fprintf(c->predictions, "%d\n", (int)res);
+
         }
+        free(output);
     }
     c->accuracy_validation = ((double) sum * 100)/data_get_n_samples(*(c->data_validation));
     // printf("El porcentaje de acierto es de %lf \n", ((double) sum * 100)/data_get_n_samples(*(c->data_validation)));
@@ -175,25 +183,31 @@ void nnc_run_training_epoch(Classifier * c){
     Sample * s;
 
     int n_clases = data_get_n_classes(*c->data_training);
+    int n_neurons = nn_get_n_neurons(&(*c->nn));
 
-    values = (double *) malloc(n_clases* sizeof(double));
+    values = (double *) malloc(n_neurons* sizeof(double));
+    
     for( i = 0 ; i < data_get_n_samples(*(c->data_training)) ; i++){
         s = data_get_samples(*(c->data_training))[i];
         int n_attrs = sample_get_n_attrs(*s);
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0, 1);
         //fprint_output(c->nn, stdout);
-        if(n_clases == 2 && c->bipolar==1){
+        if(c->mode_unique_neuron == 1){
             values[0] = sample_get_class(*s);
         }
         else{
             for( j = 0 ; j< n_clases ; j++ ){
-            values[j] = 0;
+                if(c->bipolar == 1)
+                    values[j] = -1;
+                else
+                    values[j] = 0;
             }
 
             values[sample_get_class(*s)] = 1;
         }
-        //fprint_w(c->nn,stdout);
-
+        //fprint_output(c->nn,stdout);
+       // fprint_w(c->nn,stdout);
+        //fprint_neurons(c->nn,stdout);
         nn_compute_out_err(c->nn, values);
         nn_update_weights(c->nn, c->learning_rate, values);
 
@@ -217,7 +231,7 @@ double nnc_run_statistics(Classifier * c){
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1);
         output = nn_get_output(c->nn);
 
-        if(n_clases == 2 && c->bipolar==1){
+        if(c->mode_unique_neuron == 1){
             if(c->function_transfer){
                 if((output[0] >= 0 && sample_get_class(*s)==1) || (output[0] < 0 && sample_get_class(*s)==-1) )
                     sum++;
@@ -238,17 +252,23 @@ double nnc_run_statistics(Classifier * c){
                         aux = output[j];
                     }
                 }
-                printf("%d  %lf  %lf\n",pos ,output[0],output[1] );
+                //printf("%d  %lf  %lf\n",pos ,output[0],output[1] );
                 if(pos == sample_get_class(*s) )
                     sum++;
             }
             else{
                 pos = sample_get_class(*s);
-                if(output[sample_get_class(*s)] == 1)
+                if(output[pos] == 1)
                   sum++;
             }
-
+            for (j = 0; j < n_clases; j++){
+                if(j == pos)
+                    error+= pow((1 - output[j]),2);
+                else
+                    error+= pow((-1 - output[j]),2);
+            }
         }
+        free(output);
 
     }
     fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));

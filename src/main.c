@@ -30,7 +30,9 @@ int preset          = -1;
 int max_epochs      = -1;
 int percen          = -1;
 int hidden_neurons  =  0;
+int n_layers        =  2;
 double learning_rate = 0;
+int unique_neuron   =  0;
 /* Flags */
 int predict_flag    = 0;
 int save_flag       = 0;
@@ -124,7 +126,7 @@ int main(int argc, char *argv[]){
         /* STANDARD MODE */
         /* Read data */
 
-        data = data_from_file(input_file, 1);
+        data = data_from_file(input_file, unique_neuron);
         if (!data) {
             printf("[ ERROR] Error reading input file.\n");
             return -1;
@@ -135,7 +137,7 @@ int main(int argc, char *argv[]){
         if ((strcmp("no_file", neural_file) != 0) && save_flag==0) {
             nn = nn_read_from_file(neural_file);
         } else {
-            nn = nn_init(n_attrs, n_clases, 2, 1, 1);
+            nn = nn_init(n_attrs, n_clases, n_layers, 1, 1, unique_neuron, hidden_neurons);
         }
         if (!nn) {
             printf("[ ERROR] Error reading neural network file.\n");
@@ -153,17 +155,17 @@ int main(int argc, char *argv[]){
         case MODE_PERCEPTRON:
             nn_set_function_neuron(nn , upd_neuron_perceptron);
             nn_set_function_weight(nn , upd_weights_perceptron);
-            nnc_set_training_parameters(nnc, learning_rate, 1, 0);
+            nnc_set_training_parameters(nnc, learning_rate, 1, 0, unique_neuron);
             break;
         case MODE_ADELINE:
             nn_set_function_neuron(nn , upd_neuron_adeline);
             nn_set_function_weight(nn , upd_weights_adeline);
-            nnc_set_training_parameters(nnc, learning_rate, 1, 1);
+            nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
             break;
         case MODE_MULTILAYER:
             nn_set_function_neuron(nn, upd_neuron_sigmoid);
             nn_set_function_weight(nn, upd_weights_sigmoid);
-            //TODO que parameters poner?????
+            nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
         }
         fflush(stdout);
         if(max_epochs != -1){
@@ -197,6 +199,7 @@ int process_opts(int argc, char *const *argv) {
                 {"stats-file",      required_argument,  0, 'c'},
                 {"preset",          required_argument,  0, 'p'},
                 {"hidden-neurons",  required_argument,  0, 'h'},
+                {"max-epochs",  required_argument,  0, 'e'},
                 {"predict",         no_argument,        0, 'f'},
                 {"train-percent",   required_argument,  0, 't'},
                 {"learning-rate",   required_argument,  0, 'l'},
@@ -207,7 +210,7 @@ int process_opts(int argc, char *const *argv) {
 
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "m:n:i:o:p:ft:skl:c:h:", long_options, &option_index);
+        c = getopt_long (argc, argv, "m:n:i:o:p:ft:skl:c:h:e:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -218,8 +221,10 @@ int process_opts(int argc, char *const *argv) {
             printf("[ INFO ] Mode: %s\n", optarg);
             if (!strcmp(optarg, "perceptron")) {
                 mode = MODE_PERCEPTRON;
+                unique_neuron = 1;
             } else if (!strcmp(optarg, "adaline")) {
                 mode = MODE_ADELINE;
+                unique_neuron = 1;
             } else if (!strcmp(optarg, "multilayer")) {
                 mode = MODE_MULTILAYER;
             } else {
@@ -258,6 +263,9 @@ int process_opts(int argc, char *const *argv) {
             break;
         case 'h':
             hidden_neurons = atoi(optarg);
+            if(hidden_neurons > 0){
+                n_layers++;
+            }
             break;
         case 's':
             save_flag = 1;
@@ -286,7 +294,7 @@ int process_opts(int argc, char *const *argv) {
     if ( (mode == MODE_PRESET) && (preset == -1)) {
         return -1;
     }
-    if ( (mode == MODE_MULTILAYER) && (hidden_neurons >= 0)) {
+    if ( (mode == MODE_MULTILAYER) && (hidden_neurons < 0)) {
         printf("[ WARN ] Mode set to multilayer but no neurons in hidden layer set.");
     }
     return 0;

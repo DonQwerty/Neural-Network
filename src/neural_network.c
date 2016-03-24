@@ -52,13 +52,13 @@ Neural_Network * nn_new(int n_layers, int * n_neurons_layer, double * thresholds
     return nn;
 }
 
-Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar , int sesg) {
+Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar , int sesg, int mode, int hidden_neurons) {
     Neural_Network * nn;
     int  n_neurons;
     int * n_neurons_layer;
     double * thresholds;
-    double * cons;
-    int i, j;
+    double * cons, * cons_empty;
+    int i, j, k;
     double r;
    srand(time(NULL));
    //TODO V 2.0 Create different layers
@@ -68,7 +68,14 @@ Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar , in
         // printf("%d ", n_neurons_layer[i]);
    // }
     n_neurons_layer[0] = n_attrs+sesg;
-    n_neurons_layer[1] = (bipolar ==  1) ? 1 : n_clas;
+    if(n_layers > 2){
+    	n_neurons_layer[1] = hidden_neurons + sesg;
+    	n_neurons_layer[2] = n_clas;
+    }
+    else{
+    	n_neurons_layer[1] = (mode ==  1) ? 1 : n_clas;
+    }
+    
 
 
     n_neurons = 0;
@@ -87,23 +94,43 @@ Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar , in
     free(n_neurons_layer);
     /* Add neurons connections */
     cons = (double * ) malloc(n_neurons * sizeof(double));
-    for (i = 0; i < n_neurons; i++) {
-        /* Read connections for neuron i */
-        for (j = 0; j < n_neurons; j++) {
-            if(i >= n_attrs+sesg && j<i){
-                r = ((double)rand())/RAND_MAX-0.5;
-                while(r==0){
-                    r = ((double)rand())/RAND_MAX-0.5;
-                }
-                cons[j] = r;
-            }
-            else{
-                cons[j] = 0;
-            }
-        }
-        nn_connect_neuron(nn, i, cons);
+    cons_empty = (double * ) malloc(n_neurons * sizeof(double));
+
+    for(j = 0; j < n_neurons; j++){
+	    	cons_empty[j] = 0;
+	}
+
+    Neural_Layer * layers = nn_get_layers(nn);
+    int n = 0;
+    for (i = 0 ; i < n_layers ; i++){
+
+    	for(j = 0; j < n_neurons; j++){
+	    	cons[j] = 0;
+	    }
+    	for(j = 0 ; j < layer_get_n_neurons(layers + i) ; j++){
+	    	if( i != 0){
+		    	for (k = 0 ; k < layer_get_n_neurons(layers +i -1) ; k++){
+		    		r = ((double)rand())/RAND_MAX-0.5;
+                	while(r==0){
+                    	r = ((double)rand())/RAND_MAX-0.5;
+                	}
+                	cons[k+n] = r;
+		    	}
+		    	if(j == (layer_get_n_neurons(layers + i)-1) && i != (n_layers-1)){
+		    		nn_connect_neuron(nn, j+n+layer_get_n_neurons(layers +i -1), cons_empty);
+		    		nn_array(nn)[j+n+layer_get_n_neurons(layers +i -1)].d = 1;
+		    	}
+		    	else
+		    		nn_connect_neuron(nn, j+n+layer_get_n_neurons(layers +i -1), cons);
+	    	}
+	    	else
+	    		nn_connect_neuron(nn, j, cons_empty);	
+	    }
+	    if(i!=0) n+= layer_get_n_neurons(layers +i -1);
     }
+
     free(cons);
+    free(cons_empty);
     return nn;
 }
 
@@ -269,12 +296,22 @@ void fprint_output(Neural_Network * nn, FILE * f){
     }
     fprintf(f, "\n");
 }
+void fprint_neurons(Neural_Network * nn, FILE * f){
+    int i;
+    for(i = 0; i < nn->n_neurons ; i++){
+        fprintf(f, "%f\t", nn_array(nn)[i].d);
+    }
+    fprintf(f, "\n");
+}
 
 void fprint_w(Neural_Network * nn, FILE * f){
     int i;
    // printf("%d\n",nn_array(nn)[10].n_cons);
-    for(i = 0; i < nn_array(nn)[9].n_cons ; i++){
-        fprintf(f, "%lf\t", nn_array(nn)[9].cons[i].weight);
+    for(i = 0; i < nn_array(nn)[7].n_cons ; i++){
+        fprintf(f, "%lf\t", nn_array(nn)[3].cons[i].weight);
+    }
+    for(i = 0; i < nn_array(nn)[6].n_cons ; i++){
+        fprintf(f, "%lf\t", nn_array(nn)[4].cons[i].weight);
     }
     //for(i = 0; i < nn_array(nn)[11].n_cons ; i++){
        // fprintf(f, "%lf\t", nn_array(nn)[11].cons[i].weight);
@@ -305,7 +342,7 @@ void nn_compute_out_err(Neural_Network * nn, double * values) {
     neurons = layer_get_neurons(output);
     for (i = 0; i < layer_get_n_neurons(output); i++) {
         cur = neurons + i;
-        neuron_set_err(cur, values[i] - neuron_get_new_value(cur));
+        neuron_set_err(cur, values[i] - neuron_get_value(cur));
     }
 
 }
@@ -316,7 +353,7 @@ void neuron_set_err(Neuron * n, double err) {
 
 void nn_update_weights(Neural_Network * nn, double alpha, double * t){
     int i,j=0;
-    for (i = nn->n_neurons -1; i >= nn->n_neurons -1; i--) {
+    for (i = nn->n_neurons -1; i >= 0; i--) {
         (*nn->upd_weight)(&nn_array(nn)[i], alpha , t[j]);
         j++;
     }
@@ -402,6 +439,7 @@ int layer_init(Neural_Layer * l, int n_neurons, Neuron * first) {
 int neuron_init(Neuron * n, double threshold) {
     if (!n) return -1;
     n->d = 0.0;
+    n->d_in = 0.0;
     n->d_new = 0.0;
     n->err = 0.0;
     n->n_cons = 0;
@@ -457,7 +495,9 @@ double neuron_get_value(Neuron * n){
 double neuron_get_new_value(Neuron * n){
     return n->d_new;
 }
-
+double neuron_get_value_in(Neuron * n){
+    return n->d_in;
+}
 int neuron_get_n_cons(Neuron * n){
     return n->n_cons;
 }
@@ -520,6 +560,11 @@ double neuron_get_input(Neuron * neuron) {
         Neuron * n = connection_get_neuron_from(c + i);
         value += weight * neuron_get_value(n);
     }
-    neuron->d_in = value;
+    if(neuron_get_n_cons(neuron)==0){
+    	value = 1;
+    	neuron->d_in = 1;	
+    }
+    else
+    	neuron->d_in = value;
     return value;
 }
