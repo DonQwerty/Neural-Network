@@ -6,7 +6,7 @@
 
 /* Public Methods */
 
-void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen){
+void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen,int normal){
 	int i,r,n;
 	int index;
 	Sample * aux;
@@ -21,6 +21,11 @@ void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen
        data->samples[r+i] =  aux;
 	}
   if (porcen==100){
+    if(normal){
+	for (i = 0 ; i < n ; i++){
+		//holis
+	}
+    }
     n_samples_set(*train,n);
     n_samples_set(*test, n );
     n_classes_set(*train,data->n_classes);

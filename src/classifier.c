@@ -63,7 +63,7 @@ int nnc_set_data(Classifier * c, Data * d, int flag, int percen) {
     }
     if(percen == -1)
         percen = DEF_TRAINIG_PERCENT;
-    train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, percen);
+    train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, percen,0);
 
     return 0;
 }
@@ -99,6 +99,8 @@ int nnc_train_network(Classifier * c){
         fflush(stdout);
         nnc_run_training_epoch(c);
         accuracy = nnc_run_statistics(c);
+	fprintf(c->file_statistics,"%d\t%f\t",c->epoch,c->mse_training);
+	fprint_w(c->nn,c->file_statistics);
         c->epoch++;
     }
 
@@ -271,7 +273,8 @@ double nnc_run_statistics(Classifier * c){
         free(output);
 
     }
-    fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));
+    c->mse_training = error/data_get_n_samples(*(c->data_training));
+    //fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));
     return ((double) sum*100 )/ data_get_n_samples(*(c->data_training));
 }
 

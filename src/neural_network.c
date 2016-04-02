@@ -305,18 +305,14 @@ void fprint_neurons(Neural_Network * nn, FILE * f){
 }
 
 void fprint_w(Neural_Network * nn, FILE * f){
-    int i;
-   // printf("%d\n",nn_array(nn)[10].n_cons);
-    for(i = 0; i < nn_array(nn)[7].n_cons ; i++){
-        fprintf(f, "%lf\t", nn_array(nn)[3].cons[i].weight);
+    int i,j;
+    for(i = 0; i < nn->n_neurons ; i++){
+	for (j = 0; j< nn_array(nn)[i].n_cons; j++){
+	    fprintf(f, "%lf;", nn_array(nn)[i].cons[j].weight);
+	}
     }
-    for(i = 0; i < nn_array(nn)[6].n_cons ; i++){
-        fprintf(f, "%lf\t", nn_array(nn)[4].cons[i].weight);
-    }
-    //for(i = 0; i < nn_array(nn)[11].n_cons ; i++){
-       // fprintf(f, "%lf\t", nn_array(nn)[11].cons[i].weight);
-   // }
-    fprintf(f, "\n\n");
+
+    fprintf(f, "\n");
 }
 
 
