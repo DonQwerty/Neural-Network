@@ -20,6 +20,7 @@ Classifier * nnc_new(char * output, char * stats_file, int normalize) {
     c->bipolar = 0;
     c->function_transfer=0;
     c->mode_unique_neuron=0;
+	c->data_flag=0;
 
     /* Default Parameters */
     c->learning_rate = DEF_LEARNING_RATE;
@@ -67,6 +68,7 @@ int nnc_set_data(Classifier * c, Data * d, int flag, int percen) {
     }
     if(percen == -1)
         percen = DEF_TRAINIG_PERCENT;
+	if(percen == 100) c->data_flag=1;
     train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, percen,0);
 	double ** mean_desv = NULL;
 	if(c->normalize){
@@ -119,8 +121,10 @@ int nnc_free(Classifier * c){
     fclose(c->file_statistics );
     fclose(c->predictions);
     nn_free(c->nn);
-	if(c->data_training == c->data_validation)
+	if(c->data_flag ==1){
     	data_free(c->data_training);
+		free(c->data_validation);
+	}
 	else{
 		n_samples_set(c->data_training,data_get_n_samples(*(c->data_training))+data_get_n_samples(*(c->data_validation)));
 		data_free(c->data_training);

@@ -32,6 +32,7 @@ typedef struct Classifier_ {
 	int normalize;
     int function_transfer;
     int mode_unique_neuron;
+	int data_flag;
 
     /* Epoch Statistics */
     FILE * file_statistics;
