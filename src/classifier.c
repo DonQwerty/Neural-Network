@@ -5,7 +5,7 @@
 #include "classifier.h"
 
 /* Public Methods */
-Classifier * nnc_new(char * output, char * stats_file) {
+Classifier * nnc_new(char * output, char * stats_file, int normalize) {
     Classifier * c;
     c = (Classifier *) malloc(sizeof(Classifier));
     if (!c) return NULL;
@@ -16,6 +16,7 @@ Classifier * nnc_new(char * output, char * stats_file) {
     c->data_generalization = NULL;
     c->data_validation = NULL;
     c->epoch = 0;
+	c->normalize = normalize;
     c->bipolar = 0;
     c->function_transfer=0;
     c->mode_unique_neuron=0;
@@ -59,13 +60,57 @@ int nnc_set_data(Classifier * c, Data * d, int flag, int percen) {
     if(flag){
         c->data_training = d;
         c->data_validation = d;
+		if(c->normalize){
+			data_normalize(d, nn_get_array_means(c->nn), nn_get_array_desv(c->nn));
+		}
         return 0;
     }
     if(percen == -1)
         percen = DEF_TRAINIG_PERCENT;
     train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, percen,0);
+	double ** mean_desv = NULL;
+	if(c->normalize){
+		mean_desv = nnc_calculate_mean_desv(c->data_training);
+		
+		nn_set_array_mean(c->nn,mean_desv[0]);
+		nn_set_array_desv(c->nn,mean_desv[1]);	
+		data_normalize(c->data_training, mean_desv[0], mean_desv[1]);
+		data_normalize(c->data_validation, mean_desv[0], mean_desv[1]);	
+		free(mean_desv);
+	}
 
     return 0;
+}
+
+double ** nnc_calculate_mean_desv( Data * d){
+	int i,j;
+	double val;
+	double ** mean_desv = (double **)malloc(2*sizeof(double*));
+	
+	int n = sample_get_n_attrs(*(data_get_samples(d)[0]));
+	
+	int n_samples = data_get_n_samples(*d);
+	mean_desv[0] = (double *)malloc(n*sizeof(double));
+	mean_desv[1] = (double *)malloc(n*sizeof(double));
+	for( j = 0; j< n; j++){
+		mean_desv[0][j] = 0;	
+		mean_desv[1][j] = 0;
+	}
+	for( i = 0; i< n_samples; i++){
+		for( j = 0; j< n; j++){
+			val = sample_get_values(*(data_get_samples(d)[i]))[j];
+			mean_desv[0][j] += val;	
+			mean_desv[1][j] += pow(val,2);
+		}
+	}
+	for( j = 0; j< n; j++){
+		mean_desv[0][j] = mean_desv[0][j]/n_samples;	
+	}
+	for( j = 0; j< n; j++){
+		mean_desv[1][j] = mean_desv[1][j]/n_samples - pow(mean_desv[0][j],2);	
+	}
+	
+	return mean_desv;
 }
 
 int nnc_free(Classifier * c){
@@ -74,7 +119,14 @@ int nnc_free(Classifier * c){
     fclose(c->file_statistics );
     fclose(c->predictions);
     nn_free(c->nn);
-    data_free(c->data_training);
+	if(c->data_training == c->data_validation)
+    	data_free(c->data_training);
+	else{
+		n_samples_set(c->data_training,data_get_n_samples(*(c->data_training))+data_get_n_samples(*(c->data_validation)));
+		data_free(c->data_training);
+		free(c->data_validation);
+		//data_free(c->data_validation);
+	}
     free(c);
     return 0;
 
@@ -93,13 +145,13 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 int nnc_train_network(Classifier * c){
 
     double accuracy;
-
+	fprintf(c->file_statistics,"Epoca Error Pesos\n");
     while(nnc_check_stopping_conditions(c) != 1){
         // printf("---Epoca %d--\n" , c->epoch);
         fflush(stdout);
         nnc_run_training_epoch(c);
         accuracy = nnc_run_statistics(c);
-	fprintf(c->file_statistics,"%d\t%f\t",c->epoch,c->mse_training);
+	fprintf(c->file_statistics,"%d %f ",c->epoch,c->mse_training);
 	fprint_w(c->nn,c->file_statistics);
         c->epoch++;
     }
@@ -117,7 +169,7 @@ double nnc_classifier(Classifier * c, int predict_flag){
     double res=0;
     int n_clases = data_get_n_classes(*c->data_validation);
     for ( i = 0; i < data_get_n_samples(*(c->data_validation)); i++){
-        Sample * s = data_get_samples(*(c->data_validation))[i];
+        Sample * s = data_get_samples((c->data_validation))[i];
         int n_attrs = sample_get_n_attrs(*s);
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1);
         output = nn_get_output(c->nn);
@@ -139,7 +191,7 @@ double nnc_classifier(Classifier * c, int predict_flag){
                 fprintf(c->predictions, "%d\n", (int)res);
         }
         else{
-            if(c->function_transfer){
+             if(c->function_transfer){
                 aux=output[0];
                 for(j = 0 ; j< n_clases ; j++){
                     if(output[j]>= aux){
@@ -147,18 +199,25 @@ double nnc_classifier(Classifier * c, int predict_flag){
                         aux = output[j];
                     }
                 }
+                //printf("%d  %lf  %lf\n",pos ,output[0],output[1] );
                 if(pos == sample_get_class(*s) )
                     sum++;
             }
             else{
-                if(output[sample_get_class(*s)] == 1)
+                pos = sample_get_class(*s);
+                if(output[pos] == 1)
                   sum++;
             }
-            if(!predict_flag)
-                fprintf(c->predictions, "%d\t%d\n",sample_get_class(*s), (int)res);
-            else
-                fprintf(c->predictions, "%d\n", (int)res);
 
+            if(predict_flag){
+				for(j = 0; j<n_clases ; j++){
+					if( j == pos)
+                		fprintf(c->predictions, "1 ");
+					else
+						fprintf(c->predictions, "0 ");
+				}
+				fprintf(c->predictions, "\n");
+			}
         }
         free(output);
     }
@@ -190,7 +249,7 @@ void nnc_run_training_epoch(Classifier * c){
     values = (double *) malloc(n_neurons* sizeof(double));
     
     for( i = 0 ; i < data_get_n_samples(*(c->data_training)) ; i++){
-        s = data_get_samples(*(c->data_training))[i];
+        s = data_get_samples((c->data_training))[i];
         int n_attrs = sample_get_n_attrs(*s);
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0, 1);
         //fprint_output(c->nn, stdout);
@@ -228,7 +287,7 @@ double nnc_run_statistics(Classifier * c){
     double error=0;
     int n_clases = data_get_n_classes(*c->data_training);
     for( i = 0 ; i < data_get_n_samples(*(c->data_training)) ; i++){
-        Sample * s = data_get_samples(*(c->data_training))[i];
+        Sample * s = data_get_samples((c->data_training))[i];
         int n_attrs = sample_get_n_attrs(*s);
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1);
         output = nn_get_output(c->nn);

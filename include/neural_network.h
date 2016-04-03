@@ -34,6 +34,8 @@ typedef struct Neural_Network_ {
     nn_upd_weight upd_weight;      /* Function to compute the new weight of a connection */
     int n_layers;                  /* Number of layers in the network (including in/out) */
     Neural_Layer * layers;         /* Layers array */
+	double * array_mean;
+	double * array_desv;
 } Neural_Network;
 
 
@@ -68,7 +70,7 @@ Neural_Network * nn_init(int n_attrs, int n_clas, int n_layers, int bipolar, int
 int nn_read_from_stdin(Neural_Network * nn);
 
 /* Saves the network to a file, in the format specified previously */
-int nn_save_to_file(Neural_Network * nn, const char * file) ;
+int nn_save_to_file(Neural_Network * nn, const char * file, int n_attrs) ;
 
 /* Destroy the network structure and free memory */
 void nn_free(Neural_Network * nn);
@@ -118,6 +120,8 @@ double * nn_get_output(Neural_Network * nn);
 void nn_compute_out_err(Neural_Network * nn, double * values);
 
 /*Getters */
+double * nn_get_array_means(Neural_Network * n);
+double * nn_get_array_desv(Neural_Network * n);
 int nn_get_n_neurons(Neural_Network * n);
 int nn_get_n_layers(Neural_Network *  n);
 Neural_Layer * nn_get_layers(Neural_Network * n);
@@ -149,5 +153,8 @@ void connection_set_delta(Connection * c, double delta);
 
 void nn_set_function_weight(Neural_Network * nn, nn_upd_weight upd);
 void nn_set_function_neuron(Neural_Network * nn, nn_upd_neuron upd);
+
+void nn_set_array_mean(Neural_Network * nn, double *means);
+void nn_set_array_desv(Neural_Network * nn, double *desv);
 
 #endif /* NEURAL_NETWORK_H */

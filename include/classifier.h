@@ -29,6 +29,7 @@ typedef struct Classifier_ {
     double max_accuracy;
     double max_mse;
     int bipolar;
+	int normalize;
     int function_transfer;
     int mode_unique_neuron;
 
@@ -51,13 +52,15 @@ typedef struct Classifier_ {
 
 /* Public Methods */
 /* Allocates memory for the classifier with default parameters */
-Classifier * nnc_new(char * output, char * stats_file);
+Classifier * nnc_new(char * output, char * stats_file, int normalize);
 
 /* Changes the parameters. If NULL, the default value is used */
 int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar, int function_transfer, int mode_unique_neuron);
 
 /* Receives the data and divides it into training, generalization and validation */
 int nnc_set_data(Classifier * c, Data * d, int flag, int percen);
+
+double ** nnc_calculate_mean_desv( Data * d);
 
 /* Sets the stopping conditions. If NULL, the condition is not used */
 int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accuracy, double max_mse);

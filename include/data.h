@@ -27,7 +27,7 @@ int data_init(Data * d, int n_classes, int n_samples, int n_attrs);
 Sample * sample_new(int n_attrs,int n_classes);
 void sample_fill(Sample * sample, char * text,int unique);
 void sample_free(Sample * sample);
-
+int data_normalize(Data *d, double * means, double * desv);
 /*Setter*/
 void n_classes_set(Data * d, int n_classes);
 void n_samples_set(Data * d, int n_samples);
@@ -35,7 +35,7 @@ void n_samples_set(Data * d, int n_samples);
 /*Getter */
 int data_get_n_classes(Data  d);
 int data_get_n_samples(Data  d);
-Sample ** data_get_samples(Data  d);
+Sample ** data_get_samples(Data * d);
 
 int sample_get_n_attrs(Sample  s);
 int sample_get_n_classes(Sample  s);

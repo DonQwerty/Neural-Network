@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "data.h"
+#include "math.h"
 
 /* Public Methods */
 
@@ -21,11 +22,6 @@ void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen
        data->samples[r+i] =  aux;
 	}
   if (porcen==100){
-    if(normal){
-	for (i = 0 ; i < n ; i++){
-		//holis
-	}
-    }
     n_samples_set(*train,n);
     n_samples_set(*test, n );
     n_classes_set(*train,data->n_classes);
@@ -73,6 +69,7 @@ Data * data_from_file(char * file, int unique){
         sample_fill(data->samples[i],text, unique);
         i++;
     }
+	fclose(f);
     return data;
 }
 
@@ -160,6 +157,16 @@ int data_init(Data * d, int n_classes, int n_samples, int n_attrs) {
 
   return 0;
 }
+int data_normalize(Data *d, double * means, double * desv){
+	int i, j ,n;
+	n= d->samples[0]->n_attrs;
+	for (i = 0; i < d->n_samples; i++) {
+		for (j = 0; j < n; j++) {
+      		d->samples[i]->values[j] = (d->samples[i]->values[j] - means[j])/pow(desv[j],1/2) ;
+		}
+  }
+	return 0;
+}
 
 /*Setter  */
 
@@ -183,8 +190,8 @@ int data_get_n_samples(Data  d){
 	return d.n_samples ;
 }
 
-Sample ** data_get_samples(Data  d){
-	return d.samples ;
+Sample ** data_get_samples(Data  * d){
+	return d->samples ;
 }
 
 int sample_get_n_attrs(Sample  s){
