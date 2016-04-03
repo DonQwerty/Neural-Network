@@ -1,12 +1,12 @@
 * PRACTICA 2
 ** BUGFIXES de la anterior
-*** IN-PROGRESS Liberar Memoria
+*** DONE Liberar Memoria
 **** DONE Liberar strdups del main.
-**** TODO Liberar data
+**** DONE Liberar data
      Crear data_free y data_free_keep_samples
 *** DONE Condiciones de Parada
     Implementar condiciones segun estadisticas (funcion check_stopping_conditions())
-*** TODO Estadisticas
+*** DONE Estadisticas
     Guardar en las variables de NNC los errores actualizados
 ** MAIN
 *** DONE Argumentos
