@@ -162,8 +162,11 @@ int data_normalize(Data *d, double * means, double * desv){
 	n= d->samples[0]->n_attrs;
 	for (i = 0; i < d->n_samples; i++) {
 		for (j = 0; j < n; j++) {
-      		d->samples[i]->values[j] = (d->samples[i]->values[j] - means[j])/pow(desv[j],1/2) ;
+			//printf("%lf--M:%lf--D:%lf--",d->samples[i]->values[j],means[j],pow(desv[j],1/2));
+      		d->samples[i]->values[j] = (d->samples[i]->values[j] - means[j])/pow(desv[j],0.5) ;
+			//printf("%lf\n",d->samples[i]->values[j]);
 		}
+			//printf("\n\n");
   }
 	return 0;
 }

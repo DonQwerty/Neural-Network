@@ -69,18 +69,20 @@ int nnc_set_data(Classifier * c, Data * d, int flag, int percen) {
     }
     if(percen == -1)
         percen = DEF_TRAINIG_PERCENT;
-    if(percen == 100) c->data_flag=1;
-    train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, percen,0);
     double ** mean_desv = NULL;
     if(c->normalize){
-        mean_desv = nnc_calculate_mean_desv(c->data_training);
+        mean_desv = nnc_calculate_mean_desv(d);
 
         nn_set_array_mean(c->nn,mean_desv[0]);
         nn_set_array_desv(c->nn,mean_desv[1]);
-        data_normalize(c->data_training, mean_desv[0], mean_desv[1]);
-        data_normalize(c->data_validation, mean_desv[0], mean_desv[1]);
+        data_normalize(d, mean_desv[0], mean_desv[1]);
+        //data_normalize(c->data_validation, mean_desv[0], mean_desv[1]);
         free(mean_desv);
     }
+    if(percen == 100) c->data_flag=1;
+    train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, percen,0);
+    
+    
 
     return 0;
 }
@@ -330,15 +332,16 @@ double nnc_run_statistics(Classifier * c){
             }
             for (j = 0; j < n_clases; j++){
                 if(j == pos)
-                    error+= pow((1 - output[j]),2);
+                    error+= pow((1 - (double)output[j]),2);
                 else
-                    error+= pow((-1 - output[j]),2);
+                    error+= pow((-1 - (double)output[j]),2);
             }
         }
         free(output);
 
     }
-    c->mse_training = error/data_get_n_samples(*(c->data_training));
+	error=error/n_clases;
+    c->mse_training = ((double)error)/data_get_n_samples(*(c->data_training));
     //fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));
     return ((double) sum*100 )/ data_get_n_samples(*(c->data_training));
 }
