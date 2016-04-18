@@ -13,6 +13,7 @@
 #define MODE_ADELINE      1
 #define MODE_PRESET       2
 #define MODE_MULTILAYER   3
+#define MODE_AUTOENCODER  4
 /* Presets */
 #define PRESET_MCCULLOCH  0
 
@@ -164,10 +165,14 @@ int main(int argc, char *argv[]){
             nn_set_function_weight(nn , upd_weights_adeline);
             nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
             break;
+        case MODE_AUTOENCODER:
+            /* TODO Hacer */
+            // Poner a 1 el encoder_flag
         case MODE_MULTILAYER:
             nn_set_function_neuron(nn, upd_neuron_sigmoid);
             nn_set_function_weight(nn, upd_weights_sigmoid);
             nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
+            break;
         }
         fflush(stdout);
         if(max_epochs != -1){
