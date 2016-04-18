@@ -73,7 +73,7 @@ int nnc_train_network(Classifier * c);
 double nnc_classifier(Classifier * c,int real_class);
 
 /* Prezi Print */
-void nnc_print_info(Classifier * c);
+void nnc_print_info(Classifier * c, int predict_flag);
 
 /* Deletes the classifier and the neural network and frees its memory */
 int nnc_free(Classifier * c);

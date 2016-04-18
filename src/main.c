@@ -33,7 +33,7 @@ int hidden_neurons  =  0;
 int n_layers        =  2;
 double learning_rate = 0;
 int unique_neuron   =  0;
-int normalize		=  0;
+int normalize       =  0;
 /* Flags */
 int predict_flag    = 0;
 int save_flag       = 0;
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]){
         n_attrs = sample_get_n_attrs(*(data_get_samples(data)[0]));
         n_clases = data_get_n_classes(*data);
         /* Create network */
-        if ((strcmp("no_file", neural_file) != 0) && save_flag==0) {
+        if ((strcmp("no_file", neural_file) != 0) && save_flag == 0) {
             nn = nn_read_from_file(neural_file);
         } else {
             nn = nn_init(n_attrs, n_clases, n_layers, 1, 1, unique_neuron, hidden_neurons);
@@ -148,9 +148,9 @@ int main(int argc, char *argv[]){
 
         /* Create Classifier */
         nnc = nnc_new(output_file, stats_file, normalize);
-		nnc_set_neural_network(nnc, nn);
+        nnc_set_neural_network(nnc, nn);
         nnc_set_data(nnc, data, predict_flag, percen);
-        
+
 
         /* Assign mode */
         switch (mode) {
@@ -177,13 +177,13 @@ int main(int argc, char *argv[]){
             /* No predictions file. Train network */
             nnc_train_network(nnc);
         if (save_flag){
-			if(normalize)
-            	nn_save_to_file(nn, neural_file, n_attrs);
-			else
-				nn_save_to_file(nn, neural_file, 0);
+            if(normalize)
+                nn_save_to_file(nn, neural_file, n_attrs);
+            else
+                nn_save_to_file(nn, neural_file, 0);
         }
-		nnc_classifier(nnc, predict_flag);
-        if(!predict_flag) nnc_print_info(nnc);
+        nnc_classifier(nnc, predict_flag);
+        nnc_print_info(nnc, predict_flag);
         nnc_free(nnc);
     }
 
@@ -210,7 +210,7 @@ int process_opts(int argc, char *const *argv) {
                 {"train-percent",   required_argument,  0, 't'},
                 {"learning-rate",   required_argument,  0, 'l'},
                 {"save-file",       no_argument,        0, 's'},
-				{"normalize",       no_argument,        0, 'z'},
+                {"normalize",       no_argument,        0, 'z'},
                 {"help",            no_argument,        0, 'k'},
                 {0, 0, 0, 0}
             };
@@ -262,7 +262,7 @@ int process_opts(int argc, char *const *argv) {
         case 'e':
             max_epochs = atoi(optarg);
             break;
-		case 'z':
+        case 'z':
             normalize = 1;
             break;
         case 't':
@@ -323,7 +323,7 @@ void print_help() {
     printf("             -h, --hidden-neurons: Number of neurons in the hidden layer.\n");
     printf("             -e, --max-epochs:     Maximum number of epochs to train.\n");
     printf("             -f, --predict:        Activates the predict mode.\n");
-	printf("             -z, --normalize:      Normalizes the data.\n");
+    printf("             -z, --normalize:      Normalizes the data.\n");
     printf("             -p, --preset:         Load a predefined network [mcculloch].\n");
     printf("             -s, --save:           Writes the resulting network to NETWORK file.\n");
     printf("             -t, --train-percent:  Percent of train (integer value in range 0-100).\n");

@@ -81,8 +81,8 @@ int nnc_set_data(Classifier * c, Data * d, int flag, int percen) {
     }
     if(percen == 100) c->data_flag=1;
     train_and_test_from_data( &(c->data_training) , &(c->data_validation),d, percen,0);
-    
-    
+
+
 
     return 0;
 }
@@ -236,11 +236,15 @@ double nnc_classifier(Classifier * c, int predict_flag){
 
 
 
-void nnc_print_info(Classifier * c) {
+void nnc_print_info(Classifier * c, int predict_flag) {
     printf("[ INFO ] Number of iterations: %d\n", c->epoch);
     printf("[ INFO ] Accuracy (%% of success):\n");
-    printf("           Train: %lf\n", c->accuracy_training);
-    printf("           Test:  %lf\n", c->accuracy_validation);
+    if (predict_flag == 0) {
+        printf("           Train: %lf\n", c->accuracy_training);
+        printf("           Test:  %lf\n", c->accuracy_validation);
+    } else {
+        printf("           Acierto: %lf\n", c->accuracy_validation);
+    }
     return;
 }
 
