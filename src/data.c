@@ -49,7 +49,7 @@ Data * data_from_file(char * file, int unique){
         perror( file);
         return NULL;
     }
-    char text[100];
+    char text[400];
     int n_samples=-1;
     while(fgets(text,100,f)){
         n_samples++;
@@ -65,7 +65,8 @@ Data * data_from_file(char * file, int unique){
     Data * data=data_new();
     data_init(data,n_classes,n_samples,n_attrs);
     int i=0;
-    while(fgets(text,100,f)){
+    while(fgets(text,400,f)){
+      //printf("%s\n",text );
         sample_fill(data->samples[i],text, unique);
         i++;
     }
@@ -102,6 +103,7 @@ void sample_fill(Sample * sample, char * text, int unique){
     char * ptr = NULL;
     ptr = strtok(text,SEP);
     sample->values[0] = atof(ptr);
+    
     for(i=1 ; i < sample->n_attrs ; i++){
         ptr = strtok(NULL,SEP);
         sample->values[i] = atof(ptr);
@@ -114,7 +116,6 @@ void sample_fill(Sample * sample, char * text, int unique){
       sample->values[i] =(class == 1 ) ? -1 :  1;
       return; 
     }
-
     for(j=0 ; j < sample->n_classes ; j++){
         ptr = strtok(NULL,SEP);
         class = atoi(ptr); 
@@ -122,7 +123,6 @@ void sample_fill(Sample * sample, char * text, int unique){
             sample->values[i]=j;
         }
     }
-	
 }
 
 void sample_free(Sample * sample){

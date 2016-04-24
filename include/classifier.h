@@ -67,13 +67,13 @@ double ** nnc_calculate_mean_desv( Data * d);
 int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accuracy, double max_mse);
 
 /* Trains the network until a stopping condition is reached */
-int nnc_train_network(Classifier * c);
+int nnc_train_network(Classifier * c,int autoencoder);
 
 /*Classifies the data validation and return the success rate*/
-double nnc_classifier(Classifier * c,int real_class);
+double nnc_classifier(Classifier * c,int real_class, int autoencoder);
 
 /* Prezi Print */
-void nnc_print_info(Classifier * c, int predict_flag);
+void nnc_print_info(Classifier * c, int predict_flag, int autoencoder);
 
 /* Deletes the classifier and the neural network and frees its memory */
 int nnc_free(Classifier * c);
@@ -83,9 +83,9 @@ int nnc_set_neural_network(Classifier * c, Neural_Network * nn);
 
 
 /* Private Methods */
-void nnc_run_training_epoch(Classifier * c);
+void nnc_run_training_epoch(Classifier * c, int autoencoder);
 
-double nnc_run_statistics(Classifier * c);
+double nnc_run_statistics(Classifier * c, int autoencoder);
 
 int nnc_check_stopping_conditions(Classifier * c);
 

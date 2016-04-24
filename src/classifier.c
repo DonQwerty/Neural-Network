@@ -150,15 +150,15 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
     return 0;
 }
 
-int nnc_train_network(Classifier * c){
+int nnc_train_network(Classifier * c, int autoencoder){
 
     double accuracy;
     fprintf(c->file_statistics,"Epoca Error Pesos\n");
     while(nnc_check_stopping_conditions(c) != 1){
         // printf("---Epoca %d--\n" , c->epoch);
         fflush(stdout);
-        nnc_run_training_epoch(c);
-        accuracy = nnc_run_statistics(c);
+        nnc_run_training_epoch(c,autoencoder);
+        accuracy = nnc_run_statistics(c,autoencoder);
     fprintf(c->file_statistics,"%d %f ",c->epoch,c->mse_training);
     fprint_w(c->nn,c->file_statistics);
         c->epoch++;
@@ -169,20 +169,29 @@ int nnc_train_network(Classifier * c){
     return 0;
 }
 
-double nnc_classifier(Classifier * c, int predict_flag){
-    int i,j, pos;
+double nnc_classifier(Classifier * c, int predict_flag,int autoencoder){
+    int i,j, pos,error;
     double aux;
-    double * output;
+    double * output, *values;
     int sum = 0;
     double res=0;
+    error = 0;
     int n_clases = data_get_n_classes(*c->data_validation);
     for ( i = 0; i < data_get_n_samples(*(c->data_validation)); i++){
         Sample * s = data_get_samples((c->data_validation))[i];
         int n_attrs = sample_get_n_attrs(*s);
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1);
         output = nn_get_output(c->nn);
-        //printf("%lf %lf %lf %lf %lf\n", s->values[0],s->values[1],s->values[2],s->values[3],output[0]);
-        if(c->mode_unique_neuron == 1){
+       // printf("%lf %lf %lf %lf %lf\n", s->values[0],s->values[1],s->values[2],s->values[3],output[0]);
+        //fprint_output(c->nn, stdout);
+        if(autoencoder){
+            values = sample_get_values(*s);
+            for(j = 0; j< n_attrs;j++){
+                if(output[j]*values[j]<0)
+                    error+=1;
+            }
+        }
+        else if(c->mode_unique_neuron == 1){
             res = output[0] ;
             if(c->function_transfer){
                 res = (res < 0) ? -1 : 1;
@@ -229,6 +238,7 @@ double nnc_classifier(Classifier * c, int predict_flag){
         }
         free(output);
     }
+    c->mse_validation = ((double)error)/data_get_n_samples(*(c->data_validation));
     c->accuracy_validation = ((double) sum * 100)/data_get_n_samples(*(c->data_validation));
     // printf("El porcentaje de acierto es de %lf \n", ((double) sum * 100)/data_get_n_samples(*(c->data_validation)));
     return ((double) sum * 100)/data_get_n_samples(*(c->data_validation));
@@ -236,8 +246,15 @@ double nnc_classifier(Classifier * c, int predict_flag){
 
 
 
-void nnc_print_info(Classifier * c, int predict_flag) {
+void nnc_print_info(Classifier * c, int predict_flag, int autoencoder) {
     printf("[ INFO ] Number of iterations: %d\n", c->epoch);
+    
+    if(autoencoder){
+        printf("[ INFO ] Pixel error:\n");
+        printf("           Train: %lf\n", c->mse_training);
+        printf("           Test:  %lf\n", c->mse_validation);
+        return;
+    }
     printf("[ INFO ] Accuracy (%% of success):\n");
     if (predict_flag == 0) {
         printf("           Train: %lf\n", c->accuracy_training);
@@ -250,9 +267,9 @@ void nnc_print_info(Classifier * c, int predict_flag) {
 
 
 /* Private Methods */
-void nnc_run_training_epoch(Classifier * c){
+void nnc_run_training_epoch(Classifier * c, int autoencoder){
     int i , j;
-    double * values;
+    double * values,* entry;
     Sample * s;
 
     int n_clases = data_get_n_classes(*c->data_training);
@@ -262,10 +279,16 @@ void nnc_run_training_epoch(Classifier * c){
 
     for( i = 0 ; i < data_get_n_samples(*(c->data_training)) ; i++){
         s = data_get_samples((c->data_training))[i];
+        entry = sample_get_values(*s);
         int n_attrs = sample_get_n_attrs(*s);
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0, 1);
         //fprint_output(c->nn, stdout);
-        if(c->mode_unique_neuron == 1){
+        if(autoencoder){
+            for( j = 0 ; j< n_clases ; j++ ){
+                values[j] = entry[j];
+            }
+        }
+        else if(c->mode_unique_neuron == 1){
             values[0] = sample_get_class(*s);
         }
         else{
@@ -291,11 +314,11 @@ void nnc_run_training_epoch(Classifier * c){
     free(values);
 }
 
-double nnc_run_statistics(Classifier * c){
+double nnc_run_statistics(Classifier * c, int autoencoder){
     int i ,j, pos;
     double aux;
     int sum = 0;
-    double * output;
+    double * output, *values;
     double error=0;
     int n_clases = data_get_n_classes(*c->data_training);
     for( i = 0 ; i < data_get_n_samples(*(c->data_training)) ; i++){
@@ -303,8 +326,14 @@ double nnc_run_statistics(Classifier * c){
         int n_attrs = sample_get_n_attrs(*s);
         nn_update_neurons(c->nn, sample_get_values(*s), n_attrs, 0,1);
         output = nn_get_output(c->nn);
-
-        if(c->mode_unique_neuron == 1){
+        if(autoencoder){
+            values = sample_get_values(*s);
+            for(j = 0; j< n_attrs;j++){
+                if(output[j]*values[j]<0)
+                    error+=1;
+            }
+        }
+        else if(c->mode_unique_neuron == 1){
             if(c->function_transfer){
                 if((output[0] >= 0 && sample_get_class(*s)==1) || (output[0] < 0 && sample_get_class(*s)==-1) )
                     sum++;
@@ -344,7 +373,8 @@ double nnc_run_statistics(Classifier * c){
         free(output);
 
     }
-	error=error/n_clases;
+    if(!autoencoder)
+	   error=error/n_clases;
     c->mse_training = ((double)error)/data_get_n_samples(*(c->data_training));
     //fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));
     return ((double) sum*100 )/ data_get_n_samples(*(c->data_training));

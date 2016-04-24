@@ -35,9 +35,10 @@ int n_layers        =  2;
 double learning_rate = 0;
 int unique_neuron   =  0;
 int normalize       =  0;
+int autoencoder 	=  0;
 /* Flags */
-int predict_flag    = 0;
-int save_flag       = 0;
+int predict_flag    =  0;
+int save_flag       =  0;
 /* Files */
 char neural_file[MAX_LEN_STR]  = "no_file";
 char input_file[MAX_LEN_STR]   = "no_file";
@@ -134,7 +135,7 @@ int main(int argc, char *argv[]){
             return -1;
         }
         n_attrs = sample_get_n_attrs(*(data_get_samples(data)[0]));
-        n_clases = data_get_n_classes(*data);
+        n_clases = (mode == MODE_AUTOENCODER) ? n_attrs : data_get_n_classes(*data);
         /* Create network */
         if ((strcmp("no_file", neural_file) != 0) && save_flag == 0) {
             nn = nn_read_from_file(neural_file);
@@ -146,7 +147,6 @@ int main(int argc, char *argv[]){
             data_free(data);
             return -1;
         }
-
         /* Create Classifier */
         nnc = nnc_new(output_file, stats_file, normalize);
         nnc_set_neural_network(nnc, nn);
@@ -166,8 +166,7 @@ int main(int argc, char *argv[]){
             nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
             break;
         case MODE_AUTOENCODER:
-            /* TODO Hacer */
-            // Poner a 1 el encoder_flag
+            autoencoder = 1;
         case MODE_MULTILAYER:
             nn_set_function_neuron(nn, upd_neuron_sigmoid);
             nn_set_function_weight(nn, upd_weights_sigmoid);
@@ -180,15 +179,15 @@ int main(int argc, char *argv[]){
         }
         if (!predict_flag)
             /* No predictions file. Train network */
-            nnc_train_network(nnc);
+            nnc_train_network(nnc, autoencoder);
         if (save_flag){
             if(normalize)
                 nn_save_to_file(nn, neural_file, n_attrs);
             else
                 nn_save_to_file(nn, neural_file, 0);
         }
-        nnc_classifier(nnc, predict_flag);
-        nnc_print_info(nnc, predict_flag);
+        nnc_classifier(nnc, predict_flag,autoencoder);
+        nnc_print_info(nnc, predict_flag,autoencoder);
         nnc_free(nnc);
     }
 
@@ -239,6 +238,8 @@ int process_opts(int argc, char *const *argv) {
                 unique_neuron = 1;
             } else if (!strcmp(optarg, "multilayer")) {
                 mode = MODE_MULTILAYER;
+            } else if (!strcmp(optarg, "autoencoder")) {
+                mode = MODE_AUTOENCODER;
             } else {
                 printf("[ ERROR] Unrecogniced mode: %s\n", optarg);
                 return -1;
