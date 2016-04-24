@@ -212,6 +212,9 @@ endif
 check-syntax:
 	@$(LINKER) nul $(LFLAGS) -S ${CHK_SOURCES}
 
+etags:
+	find . -type f -iname "*.[ch]" | etags -
+
 # Displays the help for this makefile
 help:
 	@echo "NEURAL NETWORK MAKEFILE"
