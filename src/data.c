@@ -8,39 +8,39 @@
 /* Public Methods */
 
 void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen,int normal){
-	int i,r,n;
-	int index;
-	Sample * aux;
-	n = data->n_samples;
-	*train = data_new();
-	*test = data_new();
-	srand(time(NULL));
-	for (i = 0 ; i < n ; i++){
-		r = rand()%(n-i);
-		aux =  data->samples[i];
+    int i,r,n;
+    int index;
+    Sample * aux;
+    n = data->n_samples;
+    *train = data_new();
+    *test = data_new();
+    srand(time(NULL));
+    for (i = 0 ; i < n ; i++){
+        r = rand()%(n-i);
+        aux =  data->samples[i];
         data->samples[i]= data->samples[r+i];
-       data->samples[r+i] =  aux;
-	}
-  if (porcen==100){
-    n_samples_set(*train,n);
-    n_samples_set(*test, n );
-    n_classes_set(*train,data->n_classes);
-    n_classes_set(*test,data->n_classes);
-   (*train)->samples = data->samples;
-   (*test)->samples = data->samples;
+        data->samples[r+i] =  aux;
+    }
+    if (porcen==100){
+        n_samples_set(*train,n);
+        n_samples_set(*test, n );
+        n_classes_set(*train,data->n_classes);
+        n_classes_set(*test,data->n_classes);
+        (*train)->samples = data->samples;
+        (*test)->samples = data->samples;
 
-  }
-  else{
-      index = (porcen* n)/100;
-    n_samples_set(*train,index);
-    n_samples_set(*test, n - index);
-    n_classes_set(*train,data->n_classes);
-    n_classes_set(*test,data->n_classes);
-    (*train)->samples = data->samples;
-    (*test)->samples = data->samples + index;
+    }
+    else{
+        index = (porcen* n)/100;
+        n_samples_set(*train,index);
+        n_samples_set(*test, n - index);
+        n_classes_set(*train,data->n_classes);
+        n_classes_set(*test,data->n_classes);
+        (*train)->samples = data->samples;
+        (*test)->samples = data->samples + index;
 
-  }
-	free(data);
+    }
+    free(data);
 }
 
 Data * data_from_file(char * file, int unique){
@@ -66,11 +66,11 @@ Data * data_from_file(char * file, int unique){
     data_init(data,n_classes,n_samples,n_attrs);
     int i=0;
     while(fgets(text,400,f)){
-      //printf("%s\n",text );
+        //printf("%s\n",text );
         sample_fill(data->samples[i],text, unique);
         i++;
     }
-	fclose(f);
+    fclose(f);
     return data;
 }
 
@@ -89,12 +89,12 @@ void data_free(Data * d){
 /* Private Methods */
 
 Sample * sample_new(int n_attrs,int n_classes){
-  Sample * sample = (Sample *) malloc(sizeof(Sample));
-  sample->n_attrs = n_attrs;
-  sample->n_classes = n_classes;
-  sample->values = (double *) malloc((n_attrs+1) * sizeof(double));
+    Sample * sample = (Sample *) malloc(sizeof(Sample));
+    sample->n_attrs = n_attrs;
+    sample->n_classes = n_classes;
+    sample->values = (double *) malloc((n_attrs+1) * sizeof(double));
 
-  return sample;
+    return sample;
 }
 
 void sample_fill(Sample * sample, char * text, int unique){
@@ -103,22 +103,22 @@ void sample_fill(Sample * sample, char * text, int unique){
     char * ptr = NULL;
     ptr = strtok(text,SEP);
     sample->values[0] = atof(ptr);
-    
+
     for(i=1 ; i < sample->n_attrs ; i++){
         ptr = strtok(NULL,SEP);
         sample->values[i] = atof(ptr);
 
     }
     if(unique){
-      ptr = strtok(NULL,SEP);
-      class = atoi(ptr); 
-      
-      sample->values[i] =(class == 1 ) ? -1 :  1;
-      return; 
+        ptr = strtok(NULL,SEP);
+        class = atoi(ptr);
+
+        sample->values[i] =(class == 1 ) ? -1 :  1;
+        return;
     }
     for(j=0 ; j < sample->n_classes ; j++){
         ptr = strtok(NULL,SEP);
-        class = atoi(ptr); 
+        class = atoi(ptr);
         if(class==1){
             sample->values[i]=j;
         }
@@ -131,54 +131,54 @@ void sample_free(Sample * sample){
 }
 
 Data * data_new(){
-  Data * data = (Data *) malloc(sizeof(Data));
-  
-  if (!data) return NULL;
-  
-  data->n_classes=0;
-  data->n_samples = 0;
-  data->samples = NULL;
+    Data * data = (Data *) malloc(sizeof(Data));
 
-  return data;
+    if (!data) return NULL;
+
+    data->n_classes=0;
+    data->n_samples = 0;
+    data->samples = NULL;
+
+    return data;
 }
 
 int data_init(Data * d, int n_classes, int n_samples, int n_attrs) {
-  int i;
+    int i;
 
-  if (!d) return -1;
+    if (!d) return -1;
 
-  d->n_classes = n_classes;
-  d->n_samples = n_samples;
-  d->samples = (Sample **) malloc(n_samples * sizeof(Sample *));
+    d->n_classes = n_classes;
+    d->n_samples = n_samples;
+    d->samples = (Sample **) malloc(n_samples * sizeof(Sample *));
 
-  for (i = 0; i < n_samples; i++) {
-      d->samples[i] = sample_new(n_attrs,n_classes);
-  }
+    for (i = 0; i < n_samples; i++) {
+        d->samples[i] = sample_new(n_attrs,n_classes);
+    }
 
-  return 0;
+    return 0;
 }
 int data_normalize(Data *d, double * means, double * desv){
-	int i, j ,n;
-	n= d->samples[0]->n_attrs;
-	for (i = 0; i < d->n_samples; i++) {
-		for (j = 0; j < n; j++) {
-			//printf("%lf--M:%lf--D:%lf--",d->samples[i]->values[j],means[j],pow(desv[j],1/2));
-      		d->samples[i]->values[j] = (d->samples[i]->values[j] - means[j])/pow(desv[j],0.5) ;
-			//printf("%lf\n",d->samples[i]->values[j]);
-		}
-			//printf("\n\n");
-  }
-	return 0;
+    int i, j ,n;
+    n= d->samples[0]->n_attrs;
+    for (i = 0; i < d->n_samples; i++) {
+        for (j = 0; j < n; j++) {
+            //printf("%lf--M:%lf--D:%lf--",d->samples[i]->values[j],means[j],pow(desv[j],1/2));
+            d->samples[i]->values[j] = (d->samples[i]->values[j] - means[j])/pow(desv[j],0.5) ;
+            //printf("%lf\n",d->samples[i]->values[j]);
+        }
+        //printf("\n\n");
+    }
+    return 0;
 }
 
 /*Setter  */
 
 void n_samples_set(Data * d, int n_samples){
-	d->n_samples = n_samples;
+    d->n_samples = n_samples;
 }
 
 void n_classes_set(Data * d, int n_classes){
-	d->n_classes = n_classes;
+    d->n_classes = n_classes;
 }
 
 
@@ -186,29 +186,29 @@ void n_classes_set(Data * d, int n_classes){
 
 
 int data_get_n_classes(Data  d){
-	return d.n_classes ;
+    return d.n_classes ;
 }
 
 int data_get_n_samples(Data  d){
-	return d.n_samples ;
+    return d.n_samples ;
 }
 
 Sample ** data_get_samples(Data  * d){
-	return d->samples ;
+    return d->samples ;
 }
 
 int sample_get_n_attrs(Sample  s){
-	return s.n_attrs ;
+    return s.n_attrs ;
 }
 
 int sample_get_n_classes(Sample  s){
-	return s.n_classes ;
+    return s.n_classes ;
 }
 
 double * sample_get_values(Sample  s){
-	return s.values ;
+    return s.values ;
 }
 
 int sample_get_class(Sample s){
-  return (int)s.values[s.n_attrs];
+    return (int)s.values[s.n_attrs];
 }
