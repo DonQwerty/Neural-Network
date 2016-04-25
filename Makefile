@@ -146,66 +146,70 @@ $(OBJECTS):$(ODIR)/%.o: $(SDIR)/%.c
 
 
 # P2
-p2: p2.2.1-multilayer4 p2.2.1-multilayer9 p2.2.2-xor p2.2.3-problema2 p2.3-problema3 p2.4-problema4 p2.5-normalizado p2.6-predicciones
+# p2: p2.2.1-multilayer4 p2.2.1-multilayer9 p2.2.2-xor p2.2.3-problema2 p2.3-problema3 p2.4-problema4 p2.5-normalizado p2.6-predicciones
 
-p2.2.1-multilayer4: compile
-ifeq ($(INPUT_FILE),no_input)
-	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -l 0.1 -h 4
-else
-	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE) -l 0.1 -h 4
-endif
+# p2.2.1-multilayer4: compile
+# ifeq ($(INPUT_FILE),no_input)
+# 	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -l 0.1 -h 4
+# else
+# 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE) -l 0.1 -h 4
+# endif
 
-p2.2.1-multilayer9: compile
-ifeq ($(INPUT_FILE),no_input)
-	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -l 0.1 -h 9
-else
-	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE) -l 0.1 -h 9
-endif
+# p2.2.1-multilayer9: compile
+# ifeq ($(INPUT_FILE),no_input)
+# 	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -l 0.1 -h 9
+# else
+# 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE) -l 0.1 -h 9
+# endif
 
-p2.2.2-xor: compile
-ifeq ($(INPUT_FILE),no_input)
-	./$(TARGET) --mode multilayer --input-file $(XOR_FILE) -l 0.02 -h 9 -t 100 -e 6000
-else
-	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 9 -t 100 -e 6000
-endif
+# p2.2.2-xor: compile
+# ifeq ($(INPUT_FILE),no_input)
+# 	./$(TARGET) --mode multilayer --input-file $(XOR_FILE) -l 0.02 -h 9 -t 100 -e 6000
+# else
+# 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 9 -t 100 -e 6000
+# endif
 
-p2.2.3-problema2: compile
-ifeq ($(INPUT_FILE),no_input)
-	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -l 0.02 -h 4
-else
-	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 4
-endif
+# p2.2.3-problema2: compile
+# ifeq ($(INPUT_FILE),no_input)
+# 	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -l 0.02 -h 4
+# else
+# 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 4
+# endif
 
-p2.3-problema3: compile
-ifeq ($(INPUT_FILE),no_input)
-	./$(TARGET) --mode multilayer --input-file $(P3_FILE) -l 0.02 -h 9
-else
-	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 9
-endif
+# p2.3-problema3: compile
+# ifeq ($(INPUT_FILE),no_input)
+# 	./$(TARGET) --mode multilayer --input-file $(P3_FILE) -l 0.02 -h 9
+# else
+# 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 9
+# endif
 
-p2.4-problema4: compile
-ifeq ($(INPUT_FILE),no_input)
-	./$(TARGET) --mode multilayer --input-file $(P4_FILE) -l 0.02 -h 4
-else
-	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 4
-endif
+# p2.4-problema4: compile
+# ifeq ($(INPUT_FILE),no_input)
+# 	./$(TARGET) --mode multilayer --input-file $(P4_FILE) -l 0.02 -h 4
+# else
+# 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 4
+# endif
 
-p2.5-normalizado: compile
-ifeq ($(INPUT_FILE),no_input)
-	./$(TARGET) --mode multilayer --input-file $(P4_FILE) -l 0.02 -h 9 -z
-else
-	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 9 -z
-endif
+# p2.5-normalizado: compile
+# ifeq ($(INPUT_FILE),no_input)
+# 	./$(TARGET) --mode multilayer --input-file $(P4_FILE) -l 0.02 -h 9 -z
+# else
+# 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE)  -l 0.02 -h 9 -z
+# endif
 
-p2.6-predicciones: compile
-ifeq ($(INPUT_FILE),no_input)
-	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -h 8 -l 0.1 -t 70 -s -n $(MULTILAYER_FILE)
-	./$(TARGET) --mode multilayer --input-file $(P2_NE_FILE) -n $(MULTILAYER_FILE) -o $(OUTPUT_FILE) -f
-else
-	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -h 8 -l 0.1 -t 70 -s -n $(MULTILAYER_FILE)
-	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE) -n $(MULTILAYER_FILE) -o $(OUTPUT_FILE) -f
-endif
+# p2.6-predicciones: compile
+# ifeq ($(INPUT_FILE),no_input)
+# 	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -h 8 -l 0.1 -t 70 -s -n $(MULTILAYER_FILE)
+# 	./$(TARGET) --mode multilayer --input-file $(P2_NE_FILE) -n $(MULTILAYER_FILE) -o $(OUTPUT_FILE) -f
+# else
+# 	./$(TARGET) --mode multilayer --input-file $(P2_FILE) -h 8 -l 0.1 -t 70 -s -n $(MULTILAYER_FILE)
+# 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE) -n $(MULTILAYER_FILE) -o $(OUTPUT_FILE) -f
+# endif
 
+p3-databases:
+	gawk -f script/genera-ruido.awk --n_pixel 1 --n_reps 10 data/databases/alfabeto.txt > data/databases/alfabeto1.txt
+	gawk -f script/genera-ruido.awk --n_pixel 3 --n_reps 10 data/databases/alfabeto.txt > data/databases/alfabeto3.txt
+	gawk -f script/genera-ruido.awk --n_pixel 5 --n_reps 10 data/databases/alfabeto.txt > data/databases/alfabeto5.txt
 
 # Flycheck (emacs) requirement
 .PHONEY: check-syntax
@@ -241,8 +245,10 @@ help:
 	# @echo "			Executes the perceptron classifier for dataset problema_real2.txt and predicts problema_real2_no_etiquetados.txt."
 	# @echo "	  - p1.3.3.1-adaline-predict"
 	# @echo "			Executes the adaline classifier for dataset problema_real2.txt and predicts problema_real2_no_etiquetados.txt."
-	@echo "   -p2"
-	@echo "         Executes all simulations for P2."
+	# @echo "   -p2"
+	# @echo "         Executes all simulations for P2."
+	@echo "	  - p3-databases"
+	@echo "			Generates files with noise for alfabeto.txt."
 	@echo "	  - clean"
 	@echo "			Removes all objects."
 	@echo "	  - help"
