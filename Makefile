@@ -211,6 +211,28 @@ p3-databases:
 	gawk -f script/genera-ruido.awk --n_pixel 3 --n_reps 10 data/databases/alfabeto.txt > data/databases/alfabeto3.txt
 	gawk -f script/genera-ruido.awk --n_pixel 5 --n_reps 10 data/databases/alfabeto.txt > data/databases/alfabeto5.txt
 
+p3.2.2-alfabeto:
+	./$(TARGET) -i data/databases/alfabeto.txt -m autoencoder -h 12 -t 100 -s -n data/models/autoencoder.txt
+
+p3.2.3-alfabeto-ruido1: p3.2.2-alfabeto p3-databases
+	./$(TARGET) -n data/models/autoencoder.txt -m autoencoder -f -i data/databases/alfabeto1.txt
+
+p3.2.3-alfabeto-ruido3: p3.2.2-alfabeto p3-databases
+	./$(TARGET) -n data/models/autoencoder.txt -m autoencoder -f -i data/databases/alfabeto3.txt
+
+p3.2.3-alfabeto-ruido5: p3.2.2-alfabeto p3-databases
+	./$(TARGET) -n data/models/autoencoder.txt -m autoencoder -f -i data/databases/alfabeto5.txt
+
+p3.2.4-alfabeto-ruido1:
+	./$(TARGET) -i data/databases/alfabeto1.txt -m autoencoder -h 12 -t 100
+
+p3.2.4-alfabeto-ruido3:
+	./$(TARGET) -i data/databases/alfabeto3.txt -m autoencoder -h 12 -t 100
+
+p3.2.4-alfabeto-ruido5:
+	./$(TARGET) -i data/databases/alfabeto5.txt -m autoencoder -h 12 -t 100
+
+
 # Flycheck (emacs) requirement
 .PHONEY: check-syntax
 check-syntax:
