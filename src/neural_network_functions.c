@@ -58,6 +58,10 @@ void upd_neuron_sigmoid (Neuron * neuron) {
     return;
 }
 
+void upd_neuron_linear (Neuron * neuron) {
+    value_neuron_set(neuron, neuron_get_input(neuron));
+}
+
 
 void upd_weights_perceptron (Neuron * neuron, double alpha, double t){
     int i;
@@ -106,6 +110,10 @@ void upd_weights_sigmoid (Neuron * neuron, double alpha, double t) {
                               connection_get_weight(cons + i) +
                               (alpha * err * neuron_get_value(from)));
     }
+
+}
+
+void upd_weights_linear (Neuron * neuron, double alpha, double t) {
 
 }
 

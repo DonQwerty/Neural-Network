@@ -14,6 +14,7 @@
 #define MODE_PRESET       2
 #define MODE_MULTILAYER   3
 #define MODE_AUTOENCODER  4
+#define MODE_TIMESERIE    5
 /* Presets */
 #define PRESET_MCCULLOCH  0
 
@@ -35,7 +36,9 @@ int n_layers        =  2;
 double learning_rate = 0;
 int unique_neuron   =  0;
 int normalize       =  0;
-int autoencoder 	=  0;
+int autoencoder     =  0;
+int n_a             =  1;
+int n_s             =  1;
 /* Flags */
 int predict_flag    =  0;
 int save_flag       =  0;
@@ -172,6 +175,10 @@ int main(int argc, char *argv[]){
             nn_set_function_weight(nn, upd_weights_sigmoid);
             nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
             break;
+        case MODE_TIMESERIE:
+            // TODO Hacer
+            // Llamar a adapta_fichero_serie(src, dst, n_a, n_s);
+            break;
         }
         fflush(stdout);
         if(max_epochs != -1){
@@ -209,13 +216,15 @@ int process_opts(int argc, char *const *argv) {
                 {"stats-file",      required_argument,  0, 'c'},
                 {"preset",          required_argument,  0, 'p'},
                 {"hidden-neurons",  required_argument,  0, 'h'},
-                {"max-epochs",  required_argument,  0, 'e'},
+                {"max-epochs",      required_argument,  0, 'e'},
                 {"predict",         no_argument,        0, 'f'},
                 {"train-percent",   required_argument,  0, 't'},
                 {"learning-rate",   required_argument,  0, 'l'},
                 {"save-file",       no_argument,        0, 's'},
                 {"normalize",       no_argument,        0, 'z'},
                 {"help",            no_argument,        0, 'k'},
+                {"n_a",             required_argument,  0, 'a'},
+                {"n_s",             required_argument,  0, 'd'},
                 {0, 0, 0, 0}
             };
 
@@ -240,6 +249,8 @@ int process_opts(int argc, char *const *argv) {
                 mode = MODE_MULTILAYER;
             } else if (!strcmp(optarg, "autoencoder")) {
                 mode = MODE_AUTOENCODER;
+            } else if (!strcmp(optarg, "timeserie")) {
+                mode = MODE_TIMESERIE;
             } else {
                 printf("[ ERROR] Unrecogniced mode: %s\n", optarg);
                 return -1;
@@ -276,6 +287,12 @@ int process_opts(int argc, char *const *argv) {
             break;
         case 'l':
             learning_rate = atof(optarg);
+            break;
+        case 'a':
+            n_a = atoi(optarg);
+            break;
+        case 'd':
+            n_s = atoi(optarg);
             break;
         case 'h':
             hidden_neurons = atoi(optarg);

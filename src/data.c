@@ -85,6 +85,13 @@ void data_free(Data * d){
     free(d);
 }
 
+void adapta_fichero_serie(char * src, char * dst, int n_a, int n_s) {
+    char cmd[] = "./adapta-fichero-serie.sh %s %s %d %d";
+    char cmd2[100];
+    sprintf(cmd2, cmd, src, dst, n_a, n_s);
+    system(cmd2);
+}
+
 
 /* Private Methods */
 

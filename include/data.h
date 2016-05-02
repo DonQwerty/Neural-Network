@@ -18,7 +18,10 @@ typedef struct Data_ {
 /* Public Methods */
 void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen,int normal);
 Data * data_from_file(char * file,int unique);
+
 void data_free(Data * d);
+
+void adapta_fichero_serie(char * src, char * dst, int n_a, int n_s);
 
 /* Private Methods */
 Data * data_new();
@@ -42,4 +45,4 @@ int sample_get_n_classes(Sample  s);
 double * sample_get_values(Sample  s);
 int sample_get_class(Sample s);
 
-#endif /* DATA_H */ 
+#endif /* DATA_H */
