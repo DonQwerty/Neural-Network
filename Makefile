@@ -206,32 +206,69 @@ $(OBJECTS):$(ODIR)/%.o: $(SDIR)/%.c
 # 	./$(TARGET) --mode multilayer --input-file $(INPUT_FILE) -n $(MULTILAYER_FILE) -o $(OUTPUT_FILE) -f
 # endif
 
+p3: p3-databases p3.2.2-alfabeto p3.2.3-alfabeto-ruido1 p3.2.3-alfabeto-ruido3 p3.2.3-alfabeto-ruido5 p3.3.1.1-timeserie1 p3.3.1.1-timeserie2 p3.3.1.1-timeserie5 p3.3.1.2-timeserie1 p3.3.1.2-timeserie2 p3.3.1.2-timeserie5 p3.3.1.3-recursiva p3.3.2.2-timeserie1 p3.3.2.2-timeserie5 p3.3.2.3-timeserie5 p3.3.2.3-timeserie15 p3.3.2.4-recursiva
+
 p3-databases:
 	gawk -f script/genera-ruido.awk --n_pixel 1 --n_reps 10 data/databases/alfabeto.txt > data/databases/alfabeto1.txt
 	gawk -f script/genera-ruido.awk --n_pixel 3 --n_reps 10 data/databases/alfabeto.txt > data/databases/alfabeto3.txt
 	gawk -f script/genera-ruido.awk --n_pixel 5 --n_reps 10 data/databases/alfabeto.txt > data/databases/alfabeto5.txt
 
-p3.2.2-alfabeto:
+p3.2.2-alfabeto: compile
 	./$(TARGET) -i data/databases/alfabeto.txt -m autoencoder -h 12 -t 100 -s -n data/models/autoencoder.txt
 
-p3.2.3-alfabeto-ruido1: p3.2.2-alfabeto p3-databases
+p3.2.3-alfabeto-ruido1: compile p3.2.2-alfabeto p3-databases
 	./$(TARGET) -n data/models/autoencoder.txt -m autoencoder -f -i data/databases/alfabeto1.txt
 
-p3.2.3-alfabeto-ruido3: p3.2.2-alfabeto p3-databases
+p3.2.3-alfabeto-ruido3: compile p3.2.2-alfabeto p3-databases
 	./$(TARGET) -n data/models/autoencoder.txt -m autoencoder -f -i data/databases/alfabeto3.txt
 
-p3.2.3-alfabeto-ruido5: p3.2.2-alfabeto p3-databases
+p3.2.3-alfabeto-ruido5: p3.2.2-alfabeto p3-databases compile
 	./$(TARGET) -n data/models/autoencoder.txt -m autoencoder -f -i data/databases/alfabeto5.txt
 
-p3.2.4-alfabeto-ruido1:
+p3.2.4-alfabeto-ruido1: p3-databases compile
 	./$(TARGET) -i data/databases/alfabeto1.txt -m autoencoder -h 12 -t 100
 
-p3.2.4-alfabeto-ruido3:
+p3.2.4-alfabeto-ruido3: p3-databases compile
 	./$(TARGET) -i data/databases/alfabeto3.txt -m autoencoder -h 12 -t 100
 
-p3.2.4-alfabeto-ruido5:
+p3.2.4-alfabeto-ruido5: p3-databases compile
 	./$(TARGET) -i data/databases/alfabeto5.txt -m autoencoder -h 12 -t 100
 
+p3.3.1.1-timeserie1: compile
+	./$(TARGET) -i data/databases/p3_serie1.txt -m timeserie -h 12 -t 50 -a 1 -d 1
+
+p3.3.1.1-timeserie2: compile
+	./$(TARGET) -i data/databases/p3_serie1.txt -m timeserie -h 12 -t 50 -a 2 -d 1
+
+p3.3.1.1-timeserie5: compile
+	./$(TARGET) -i data/databases/p3_serie1.txt -m timeserie -h 12 -t 25 -a 1 -d 1 -o salida.txt
+
+p3.3.1.2-timeserie1: compile
+	./$(TARGET) -i data/databases/p3_serie1.txt -m timeserie -h 12 -t 25 -a 1 -d 1 -o salida.txt
+
+p3.3.1.2-timeserie2: compile
+	./$(TARGET) -i data/databases/p3_serie1.txt -m timeserie -h 12 -t 25 -a 2 -d 1 -o salida.txt
+
+p3.3.1.2-timeserie5: compile
+	./$(TARGET) -i data/databases/p3_serie1.txt -m timeserie -h 12 -t 25 -a 5 -d 1 -o salida.txt
+
+p3.3.1.3-recursiva: compile
+	./$(TARGET) -i data/databases/p3_serie1.txt -m timeserie -h 20 -t 50 -a 5 -d 1 -b 0 -j 200   -o valores.txt
+
+p3.3.2.2-timeserie1: compile
+	./$(TARGET) -i data/databases/p3_serie2N.txt -m timeserie -h 12 -t 50 -a 1 -d 1
+
+p3.3.2.2-timeserie5: compile
+	./$(TARGET) -i data/databases/p3_serie2N.txt -m timeserie -h 12 -t 50 -a 5 -d 1
+
+p3.3.2.3-timeserie5: compile
+	./$(TARGET) -i data/databases/p3_serie2N.txt -m timeserie -h 12 -t 25 -a 5 -d 1
+
+p3.3.2.3-timeserie15: compile
+	./$(TARGET) -i data/databases/p3_serie2N.txt -m timeserie -h 12 -t 25 -a 15 -d 1
+
+p3.3.2.4-recursiva: compile
+	./$(TARGET) -i data/databases/p3_serie2N.txt -m timeserie -h 12 -t 50 -a 5 -d 1 -b 0 -j 200 -o valores.txt
 
 # Flycheck (emacs) requirement
 .PHONEY: check-syntax
@@ -269,6 +306,8 @@ help:
 	# @echo "			Executes the adaline classifier for dataset problema_real2.txt and predicts problema_real2_no_etiquetados.txt."
 	# @echo "   -p2"
 	# @echo "         Executes all simulations for P2."
+	@echo "   - p3"
+	@echo "         Executes all simulations for P3."
 	@echo "	  - p3-databases"
 	@echo "			Generates files with noise for alfabeto.txt."
 	@echo "	  - clean"

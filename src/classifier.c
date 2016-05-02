@@ -212,12 +212,10 @@ double nnc_classifier(Classifier * c, int predict_flag,int encoder_ts){
             values = sample_get_values(*s);
                 for (j = 0; j < n_clases; j++){
                     error+= pow((values[j+n_attrs]- (double)output[j]),2);
-                    error2+= pow((values[n_attrs-1]- (double)output[j]),2);
+                    error2+= pow((values[n_attrs-1]- (double)values[j+n_attrs]),2);
                 }
 
                 fprint_output(c->nn, c->predictions);
-                error2=error2/n_clases;
-                error=error/n_clases;
         }
         else{
              if(c->function_transfer){
@@ -249,6 +247,10 @@ double nnc_classifier(Classifier * c, int predict_flag,int encoder_ts){
             }
         }
         free(output);
+    }
+    if(encoder_ts!=1){
+        error2=error2/n_clases;
+        error=error/n_clases;
     }
     c->mse_validation = ((double)error)/data_get_n_samples(*(c->data_validation));
     c->mse_model_validation = ((double)error2)/data_get_n_samples(*(c->data_validation));
@@ -320,7 +322,7 @@ void nnc_compute_error(Classifier * nnc, int n_b, int n_f) {
 
 void nnc_print_info(Classifier * c, int predict_flag, int encoder_ts) {
     printf("[ INFO ] Number of iterations: %d\n", c->epoch);
-    
+
     if(encoder_ts==1){
         printf("[ INFO ] Pixel error:\n");
         printf("           Train: %lf\n", c->mse_training);
@@ -376,7 +378,7 @@ void nnc_run_training_epoch(Classifier * c, int encoder_ts){
             if(encoder_ts==2){
                for( j = 0 ; j< n_clases ; j++ ){
                     values[j] =entry[j+n_attrs];
-                } 
+                }
             }
             else{
                 for( j = 0 ; j< n_clases ; j++ ){
@@ -388,7 +390,7 @@ void nnc_run_training_epoch(Classifier * c, int encoder_ts){
 
                 values[sample_get_class(*s)] = 1;
             }
-            
+
         }
         //fprint_output(c->nn,stdout);
        // fprint_w(c->nn,stdout);
@@ -440,10 +442,10 @@ double nnc_run_statistics(Classifier * c, int encoder_ts){
                 values = sample_get_values(*s);
                 for (j = 0; j < n_clases; j++){
                     error+= pow((values[j+n_attrs]- (double)output[j]),2);
-                    error2+= pow((values[n_attrs-1]- (double)output[j]),2);
+                    error2+= pow((values[n_attrs-1]- (double)values[j+n_attrs]),2);
                 }
-                error2=error2/n_clases;
-                error=error/n_clases;
+                error2=error2;
+                error=error;
             }
             else{
                 if(c->function_transfer){
@@ -474,8 +476,10 @@ double nnc_run_statistics(Classifier * c, int encoder_ts){
         free(output);
 
     }
-    if(!encoder_ts)
-	   error=error/n_clases;
+    if(encoder_ts!=1){
+        error2=error2/n_clases;
+        error=error/n_clases;
+    }
     c->mse_training = ((double)error)/data_get_n_samples(*(c->data_training));
     c->mse_model_training = ((double)error2)/data_get_n_samples(*(c->data_training));
     //fprintf(c->file_statistics, "%d;%lf;%lf\n",c->epoch , ((double) sum*100 )/ data_get_n_samples(*(c->data_training)),error/data_get_n_samples(*(c->data_training)));
