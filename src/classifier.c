@@ -214,6 +214,8 @@ double nnc_classifier(Classifier * c, int predict_flag,int encoder_ts){
                     error+= pow((values[j+n_attrs]- (double)output[j]),2);
                     error2+= pow((values[n_attrs-1]- (double)output[j]),2);
                 }
+
+                fprint_output(c->nn, c->predictions);
                 error2=error2/n_clases;
                 error=error/n_clases;
         }
@@ -255,6 +257,65 @@ double nnc_classifier(Classifier * c, int predict_flag,int encoder_ts){
     return ((double) sum * 100)/data_get_n_samples(*(c->data_validation));
 }
 
+void nnc_classifier_recursive (Classifier * c, int n_a, int n_s, int n_f, double * input) {
+   int i, j;
+   double * output;
+   double * values;
+   if (n_f > 0) {
+       /* Store values for the next call */
+       values = (double *) malloc(n_a * sizeof(double));
+       for (i = 0; i < n_a - n_s; i++) {
+           values[i] = input[i + n_s];
+       }
+       /* Feed the data through the network */
+       nn_update_neurons(c->nn, input, n_a, 0, 1);
+       output = nn_get_output(c->nn);
+
+       /* Write predictions to file */
+       for (j = 0; j < n_s; j++) {
+           fprintf(c->predictions, "%lf\n", output[j]);
+           values[i + j] = output[j];
+       }
+
+       /* Recursive call */
+       nnc_classifier_recursive(c, n_a, n_s, n_f - n_s, values);
+
+       /* Free arrays */
+       free(values);
+       free(output);
+   }
+
+}
+
+void nnc_compute_error(Classifier * nnc, int n_b, int n_f) {
+   int i;
+   int max_iters;
+   int n_samples_test;
+   double error, errorAux, value, errorMod, errorModAux;
+
+   n_samples_test = data_get_n_samples(*(nnc->data_validation));
+   error = 0.0;
+   errorMod = 0.0;
+   rewind(nnc->file_statistics);
+
+   if (n_samples_test - n_b > n_f)
+       max_iters = n_f;
+   else
+       max_iters = n_samples_test - n_b;
+
+   for (i = 0; i < max_iters; i++) {
+       Sample * curr = data_get_samples((nnc->data_validation))[n_b + i];
+       fscanf(nnc->file_statistics, "%lf", &value);
+       errorAux = value - sample_get_values(*curr)[sample_get_n_attrs(*curr)];
+       errorModAux = sample_get_values(*curr)[sample_get_n_attrs(*curr) - 1] -
+           sample_get_values(*curr)[sample_get_n_attrs(*curr)];
+       error += pow(errorAux, 2);
+       errorMod += pow(errorModAux, 2);
+   }
+
+   nnc->mse_validation = error;
+   nnc->mse_model_validation = errorMod;
+}
 
 
 void nnc_print_info(Classifier * c, int predict_flag, int encoder_ts) {
@@ -427,4 +488,8 @@ int nnc_check_stopping_conditions(Classifier * c) {
         return 1;
     }
     return 0;
+}
+
+Data * nnc_get_data_validation(Classifier * c){
+    return c->data_validation;
 }

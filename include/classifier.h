@@ -75,6 +75,10 @@ int nnc_train_network(Classifier * c,int autoencoder);
 /*Classifies the data validation and return the success rate*/
 double nnc_classifier(Classifier * c,int real_class, int encoder_ts);
 
+void nnc_classifier_recursive (Classifier * c, int n_a, int n_s, int n_f, double * input);
+
+void nnc_compute_error(Classifier * nnc, int n_b, int n_f);
+
 /* Prezi Print */
 void nnc_print_info(Classifier * c, int predict_flag, int encoder_ts);
 
@@ -91,5 +95,7 @@ void nnc_run_training_epoch(Classifier * c, int encoder_ts);
 double nnc_run_statistics(Classifier * c, int encoder_ts);
 
 int nnc_check_stopping_conditions(Classifier * c);
+
+Data * nnc_get_data_validation(Classifier * c);
 
 #endif /* CLASSIFIER_H */

@@ -15,6 +15,7 @@
 #define MODE_MULTILAYER   3
 #define MODE_AUTOENCODER  4
 #define MODE_TIMESERIE    5
+
 /* Presets */
 #define PRESET_MCCULLOCH  0
 
@@ -39,6 +40,8 @@ int normalize       =  0;
 int encoder_ts     =  0;
 int n_a             =  1;
 int n_s             =  1;
+int n_f 			=  0;
+int n_b 			=  0;
 /* Flags */
 int predict_flag    =  0;
 int save_flag       =  0;
@@ -202,7 +205,13 @@ int main(int argc, char *argv[]){
             else
                 nn_save_to_file(nn, neural_file, 0);
         }
-        nnc_classifier(nnc, predict_flag,encoder_ts);
+        if(n_f){
+        	Sample * s = data_get_samples(nnc_get_data_validation(nnc))[n_b-1];
+        	double * values = sample_get_values(*s);
+        	nnc_classifier_recursive (nnc, n_a, n_s, n_f, values);
+        	nnc_compute_error(nnc, n_b, n_f);
+        }else
+        	nnc_classifier(nnc, predict_flag,encoder_ts);
         nnc_print_info(nnc, predict_flag,encoder_ts);
         nnc_free(nnc);
     }
@@ -234,12 +243,14 @@ int process_opts(int argc, char *const *argv) {
                 {"help",            no_argument,        0, 'k'},
                 {"n_a",             required_argument,  0, 'a'},
                 {"n_s",             required_argument,  0, 'd'},
+                {"n_f",             required_argument,  0, 'j'},
+                {"n_b",             required_argument,  0, 'b'},
                 {0, 0, 0, 0}
             };
 
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "m:n:i:o:p:ft:skl:c:h:e:za:d:", long_options, &option_index);
+        c = getopt_long (argc, argv, "m:n:i:o:p:ft:skl:c:h:e:za:d:j:b:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -262,7 +273,8 @@ int process_opts(int argc, char *const *argv) {
                 mode = MODE_TIMESERIE;
                 shuffle = 0;
                 output = 1;
-            } else {
+            }
+             else {
                 printf("[ ERROR] Unrecogniced mode: %s\n", optarg);
                 return -1;
             }
@@ -304,6 +316,12 @@ int process_opts(int argc, char *const *argv) {
             break;
         case 'd':
             n_s = atoi(optarg);
+            break;
+        case 'j':
+            n_f = atoi(optarg);
+            break;
+        case 'b':
+            n_b = atoi(optarg);
             break;
         case 'h':
             hidden_neurons = atoi(optarg);
