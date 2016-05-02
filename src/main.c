@@ -36,12 +36,14 @@ int n_layers        =  2;
 double learning_rate = 0;
 int unique_neuron   =  0;
 int normalize       =  0;
-int autoencoder     =  0;
+int encoder_ts     =  0;
 int n_a             =  1;
 int n_s             =  1;
 /* Flags */
 int predict_flag    =  0;
 int save_flag       =  0;
+int shuffle			=  1;
+int output 			=  0;
 /* Files */
 char neural_file[MAX_LEN_STR]  = "no_file";
 char input_file[MAX_LEN_STR]   = "no_file";
@@ -131,8 +133,13 @@ int main(int argc, char *argv[]){
     } else {
         /* STANDARD MODE */
         /* Read data */
-
-        data = data_from_file(input_file, unique_neuron);
+    	if(mode==MODE_TIMESERIE){
+    		char input_file_aux[MAX_LEN_STR];
+    		strcpy(input_file_aux,input_file);
+    		sprintf(input_file,"%s.ts",input_file_aux);
+    		adapta_fichero_serie(input_file_aux,input_file , n_a, n_s);
+    	}
+        data = data_from_file(input_file, unique_neuron,output);
         if (!data) {
             printf("[ ERROR] Error reading input file.\n");
             return -1;
@@ -153,7 +160,7 @@ int main(int argc, char *argv[]){
         /* Create Classifier */
         nnc = nnc_new(output_file, stats_file, normalize);
         nnc_set_neural_network(nnc, nn);
-        nnc_set_data(nnc, data, predict_flag, percen);
+        nnc_set_data(nnc, data, predict_flag, percen, shuffle);
 
 
         /* Assign mode */
@@ -169,15 +176,17 @@ int main(int argc, char *argv[]){
             nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
             break;
         case MODE_AUTOENCODER:
-            autoencoder = 1;
+            encoder_ts = 1;
         case MODE_MULTILAYER:
             nn_set_function_neuron(nn, upd_neuron_sigmoid);
             nn_set_function_weight(nn, upd_weights_sigmoid);
             nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
             break;
         case MODE_TIMESERIE:
-            // TODO Hacer
-            // Llamar a adapta_fichero_serie(src, dst, n_a, n_s);
+            nn_set_function_neuron(nn, upd_neuron_linear);
+            nn_set_function_weight(nn, upd_weights_linear);
+            nnc_set_training_parameters(nnc, learning_rate, 1, 1, unique_neuron);
+            encoder_ts = 2;
             break;
         }
         fflush(stdout);
@@ -186,15 +195,15 @@ int main(int argc, char *argv[]){
         }
         if (!predict_flag)
             /* No predictions file. Train network */
-            nnc_train_network(nnc, autoencoder);
+            nnc_train_network(nnc, encoder_ts);
         if (save_flag){
             if(normalize)
                 nn_save_to_file(nn, neural_file, n_attrs);
             else
                 nn_save_to_file(nn, neural_file, 0);
         }
-        nnc_classifier(nnc, predict_flag,autoencoder);
-        nnc_print_info(nnc, predict_flag,autoencoder);
+        nnc_classifier(nnc, predict_flag,encoder_ts);
+        nnc_print_info(nnc, predict_flag,encoder_ts);
         nnc_free(nnc);
     }
 
@@ -230,7 +239,7 @@ int process_opts(int argc, char *const *argv) {
 
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "m:n:i:o:p:ft:skl:c:h:e:z", long_options, &option_index);
+        c = getopt_long (argc, argv, "m:n:i:o:p:ft:skl:c:h:e:za:d:", long_options, &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -251,6 +260,8 @@ int process_opts(int argc, char *const *argv) {
                 mode = MODE_AUTOENCODER;
             } else if (!strcmp(optarg, "timeserie")) {
                 mode = MODE_TIMESERIE;
+                shuffle = 0;
+                output = 1;
             } else {
                 printf("[ ERROR] Unrecogniced mode: %s\n", optarg);
                 return -1;

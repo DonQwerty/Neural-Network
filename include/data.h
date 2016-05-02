@@ -10,14 +10,15 @@ typedef struct Sample_ {
 
 typedef struct Data_ {
   int n_classes;
+  int flagOutput;
 
   int n_samples;
   Sample ** samples;
 } Data;
 
 /* Public Methods */
-void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen,int normal);
-Data * data_from_file(char * file,int unique);
+void train_and_test_from_data(Data ** train,Data ** test, Data * data,int porcen,int normal, int shuffle);
+Data * data_from_file(char * file,int unique, int output);
 
 void data_free(Data * d);
 
@@ -27,8 +28,8 @@ void adapta_fichero_serie(char * src, char * dst, int n_a, int n_s);
 Data * data_new();
 int data_init(Data * d, int n_classes, int n_samples, int n_attrs);
 
-Sample * sample_new(int n_attrs,int n_classes);
-void sample_fill(Sample * sample, char * text,int unique);
+Sample * sample_new(int n_attrs,int n_classes, int flagOutput);
+void sample_fill(Sample * sample, char * text,int unique, int output);
 void sample_free(Sample * sample);
 int data_normalize(Data *d, double * means, double * desv);
 /*Setter*/

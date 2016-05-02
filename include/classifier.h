@@ -48,6 +48,9 @@ typedef struct Classifier_ {
     double mse_generalization;
     double mse_validation;
 
+    double mse_model_training;
+    double mse_model_validation; 
+
 } Classifier;
 
 
@@ -59,7 +62,7 @@ Classifier * nnc_new(char * output, char * stats_file, int normalize);
 int nnc_set_training_parameters(Classifier * c, double learning_rate,int bipolar, int function_transfer, int mode_unique_neuron);
 
 /* Receives the data and divides it into training, generalization and validation */
-int nnc_set_data(Classifier * c, Data * d, int flag, int percen);
+int nnc_set_data(Classifier * c, Data * d, int flag, int percen, int shuffle);
 
 double ** nnc_calculate_mean_desv( Data * d);
 
@@ -70,10 +73,10 @@ int nnc_set_stopping_conditions(Classifier * c, int max_epochs, double max_accur
 int nnc_train_network(Classifier * c,int autoencoder);
 
 /*Classifies the data validation and return the success rate*/
-double nnc_classifier(Classifier * c,int real_class, int autoencoder);
+double nnc_classifier(Classifier * c,int real_class, int encoder_ts);
 
 /* Prezi Print */
-void nnc_print_info(Classifier * c, int predict_flag, int autoencoder);
+void nnc_print_info(Classifier * c, int predict_flag, int encoder_ts);
 
 /* Deletes the classifier and the neural network and frees its memory */
 int nnc_free(Classifier * c);
@@ -83,9 +86,9 @@ int nnc_set_neural_network(Classifier * c, Neural_Network * nn);
 
 
 /* Private Methods */
-void nnc_run_training_epoch(Classifier * c, int autoencoder);
+void nnc_run_training_epoch(Classifier * c, int encoder_ts);
 
-double nnc_run_statistics(Classifier * c, int autoencoder);
+double nnc_run_statistics(Classifier * c, int encoder_ts);
 
 int nnc_check_stopping_conditions(Classifier * c);
 

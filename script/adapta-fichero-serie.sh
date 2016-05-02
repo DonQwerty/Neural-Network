@@ -4,6 +4,9 @@ NA=$3
 NS=$4
 
 gawk -F " " -v na=$NA -v ns=$NS '
+	BEGIN{
+		print na" "ns
+	}
 	NR>0{
 		if(NR <= ns+na){
 			data[ns+na-NR]=$1

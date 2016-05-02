@@ -114,6 +114,29 @@ void upd_weights_sigmoid (Neuron * neuron, double alpha, double t) {
 }
 
 void upd_weights_linear (Neuron * neuron, double alpha, double t) {
+	Neuron * from;
+    Connection * cons;
+    int i;
+    double err;
+
+    /* Calculo el error */
+    err = neuron_get_err(neuron) ;
+    
+
+    cons = neuron_get_connections(neuron);
+    for (i = 0; i < neuron_get_n_cons(neuron); i++) {
+        /* Retropropagación de error */
+        from = connection_get_neuron_from(cons + i);
+
+        neuron_set_err(from,
+                       neuron_get_err(from) +
+                       (connection_get_weight(cons + i) * err));
+
+        /* Actualización de pesos */
+        weight_connection_set(cons + i,
+                              connection_get_weight(cons + i) +
+                              (alpha * err * neuron_get_value(from)));
+    }
 
 }
 
